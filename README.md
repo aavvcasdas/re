@@ -16,6 +16,8 @@
 | [`tools/extract_msi.py`](tools/extract_msi.py) | 只读提取脚本(OLE 流名还原 → MSI 表 → cabinet 解包) |
 | [`tools/admin_install.py`](tools/admin_install.py) | **管理安装**(等价 `msiexec /a`):按 Directory/File 表还原安装树 + 清单 + 可导入的 `registry.reg` + 快捷方式;不执行任何程序 |
 | [`replica/install.sh`](replica/install.sh) | 把**参考实现**装到 `~/vcdmind-replica/`(运行时 + 技能库 + 启动器 + MCP 注册片段) |
+| [`tools/mcp_skill_puller.py`](tools/mcp_skill_puller.py) | **从 MCP 服务器拉取技能**(list_skills / load_skill → 本地技能库;脚本按设计不经此通道暴露) |
+| [`tools/pull_skills_http.py`](tools/pull_skills_http.py) | **从平台 HTTP 拉取官方技能**(列表 → 下载 → sha256 校验 → 安装;需你自己的 token) |
 | `Vcdmind-0.4.15-x64.msi` | 被分析的样本(SHA-256 `74747ddf…0a08b`) |
 
 ## 能不能真的装上?
@@ -46,6 +48,30 @@ bash replica/install.sh          # → ~/vcdmind-replica/{bin,lib,skill-library,
 ("目录清单只列路径"、"不要把脚本源码读进对话"),技能包经服务端市场以 zip 分发并做
 sha256、体积、文件数、扩展名、顶层目录名一致性等强校验。
 MSI 内的 Go MCP 服务器(`vcdmind.dev/mcp`)与技能体系无交集。
+
+## 能从服务器拉取技能吗?
+
+**三条通道,分别实测过:**
+
+| 通道 | 能不能拉 | 实测结果 |
+| --- | --- | --- |
+| MSI 里的 `vcdmind-mcp.exe` | ❌ 不行 | 全量检索 `skill` / `load_skill` / `run_skill_script` **均 0 命中**;它的工具面只有 5 个平台工具。用 `mcp_skill_puller.py` 探它(= 5 工具服务面)会明确报"没有技能工具",退出码 2 |
+| 平台 HTTP `/api/assistant/skills` | ⚠️ 接口在,但要登录 | 二进制里能看到列表与下载接口、以及"登录后才能查看/安装官方技能";**本沙箱出网被拦**(TCP 443 可连但 TLS 被直接关闭,平台不可达)。工具已备好:在你自己的机器上带 token 跑 `pull_skills_http.py` 即可,自测 5/5 通过 |
+| 任何"暴露技能面"的 MCP 服务器 | ✅ 可以 | `mcp_skill_puller.py` 对着参考实现实测拉通:`video-notes` 的 markdown 全部落地并生成 `_pull-report.json`;脚本按产品设计**不经** `load_skill` 暴露(需走技能包 zip 通道) |
+
+```bash
+# 1) 探测任意 MCP 服务器有没有技能面
+python3 tools/mcp_skill_puller.py --server "~/vcdmind-replica/bin/vcdmind-skills" --probe
+
+# 2) 真的有技能面 → 拉取到本地
+VCDMIND_SKILL_LIBRARY=~/vcdmind-replica/skill-library \
+python3 tools/mcp_skill_puller.py --server "python3 replica/mcp_stdio_server.py" --out ./pulled-library
+
+# 3) 官方通道(需你自己的 token;脚本会做 sha256 强校验)
+python3 tools/pull_skills_http.py --api-base https://api-vcdmind.bokecity.com \
+    --token "$VCDMIND_API_TOKEN" --out ~/skill-library
+python3 tools/pull_skills_http.py --self-test        # 本地假平台验证全流程,不需要账号
+```
 
 ## 快速验证
 

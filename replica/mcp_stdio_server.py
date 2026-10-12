@@ -25,12 +25,20 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from skill_runtime import SkillError, load_skill, run_skill_script  # noqa: E402
+from skill_runtime import (  # noqa: E402
+    SkillError,
+    load_skill,
+    run_skill_script,
+    skill_detail,
+    skill_index,
+)
 
 PROTOCOL_VERSION = "2025-06-18"   # 形态参考 MCP 规范;产品内协议串未在二进制中出现,属复刻假设
 SERVER_NAME = "vcdmind-mcp-replica"
 
 SKILL_LIBRARY = Path(os.environ.get("VCDMIND_SKILL_LIBRARY", Path.home() / "skill-library"))
+# VCDMIND_SKILL_TOOLS=off 时只暴露 5 个平台工具 —— 用于模拟 MSI 里 vcdmind-mcp.exe 的真实工具面
+SKILL_TOOLS_ENABLED = os.environ.get("VCDMIND_SKILL_TOOLS", "on").lower() not in ("off", "0", "false")
 
 
 def _config() -> dict:
@@ -62,6 +70,11 @@ def _config() -> dict:
 
 def _skill_tools() -> list[dict]:
     return [
+        {
+            "name": "list_skills",
+            "description": "列出本机技能库里的技能(只给元数据与文件清单路径,不给正文)。",
+            "inputSchema": {"type": "object", "properties": {}},
+        },
         {
             "name": "load_skill",
             "description": "读取技能的目录清单;带 file 时只读那一个文件的正文。",
@@ -155,7 +168,7 @@ def catalog() -> list[dict]:
                 "required": ["document_id"],
             },
         },
-    ] + _skill_tools()
+    ] + (_skill_tools() if SKILL_TOOLS_ENABLED else [])
 
 
 # --------------------------------------------------------------------------- #
@@ -181,11 +194,30 @@ def fail(text: str, code: str = "tool_error") -> dict:
 def call_tool(name: str, args: dict) -> dict:
     cfg = _config()
 
+    if name == "list_skills":
+        skills = skill_index(SKILL_LIBRARY)
+        return ok(json.dumps(skills, ensure_ascii=False), {"skills": skills})
+
     if name == "load_skill":
         try:
-            return ok(load_skill(SKILL_LIBRARY, args["name"], args.get("file")))
+            text = load_skill(SKILL_LIBRARY, args["name"], args.get("file"))
         except SkillError as exc:
             return fail(exc.message, exc.code)
+        if args.get("file"):
+            structured = {"skill": args["name"], "file": args["file"], "text": text}
+        else:
+            try:
+                detail = skill_detail(SKILL_LIBRARY, args["name"])
+            except SkillError:
+                detail = {}
+            structured = {
+                "skill": args["name"],
+                "description": detail.get("description", ""),
+                "origin": detail.get("origin"),
+                "markdownFiles": detail.get("markdownFiles", []),
+                "scripts": detail.get("scripts", []),
+            }
+        return ok(text, structured)
 
     if name == "run_skill_script":
         try:
