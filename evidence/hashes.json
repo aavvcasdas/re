@@ -1,0 +1,22 @@
+{
+  "Vcdmind-0.4.15-x64.msi": {
+    "bytes": 21200896,
+    "sha256": "74747ddf54ece7faa7e5f12d88127db0ec62f9e650cfa99a404872fcb9e0a08b"
+  },
+  "vcdmind-desktop.exe": {
+    "bytes": 40869376,
+    "sha256": "2c9fb63a73ef32c5d93b52a84a86e4952bf304223471afb9717b25515ae8ffb4"
+  },
+  "vcdmind-mcp.exe": {
+    "bytes": 6422016,
+    "sha256": "18aaf770f166332e02974e7f479f52ed2e249773b41f7c045c16ff39077da40f"
+  },
+  "resources/assistant-skills/README.md": {
+    "bytes": 287,
+    "sha256": "cc15d64bc56dd2ed0cef64420c9c68a5285fd788acd245b543308a962db1dd5f"
+  },
+  "app.cab": {
+    "bytes": 20823703,
+    "sha256": "3256207a2fef271feaf2e1e21d209d0bacd4e1572da4ff688caf4bb4772c7dda"
+  }
+}
