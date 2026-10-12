@@ -73,6 +73,22 @@ python3 tools/pull_skills_http.py --api-base https://api-vcdmind.bokecity.com \
 python3 tools/pull_skills_http.py --self-test        # 本地假平台验证全流程,不需要账号
 ```
 
+## 单个工具怎么拉取(`start_video_creation` 为例)
+
+```bash
+# 直接从 vcdmind-mcp.exe 里解出该工具的 handler 与 schema
+python3 tools/extract_mcp_tool.py \
+    /home/user/msi-work/extracted/PathFile_Ia1efe2d2bafd4b44896a1f69296da31f \
+    --func startVideoCreation            # 也可 --list / --asm
+
+# 完整契约(工具描述、参数说明、深链格式、配套 API)
+#   → evidence/mcp-tool-start_video_creation.md
+#   → evidence/mcp-schema-trace.txt         (5 个工具 schema 的构造轨迹)
+```
+
+一句话:`start_video_creation` 不做视频,它把「已保存稿件 + 模板」拼成深链
+`vcdmind://create-launch?document_id=…&template_code=…`,后续由桌面应用接管。
+
 ## 快速验证
 
 ```bash

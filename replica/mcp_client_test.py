@@ -87,6 +87,23 @@ def main() -> int:
         text = r["result"]["content"][0]["text"]
         print(f"   {tool:<16} isError={r['result'].get('isError', False)}  {text[:70]}")
 
+    print("\n── tools/call: start_video_creation(观察到的 schema + 深链) ──")
+    r = rpc({"jsonrpc": "2.0", "id": 10, "method": "tools/call",
+             "params": {"name": "start_video_creation",
+                        "arguments": {"document_id": "doc_123", "template_code": "tpl_abc"}}})
+    print("   structuredContent:", json.dumps(r["result"]["structuredContent"], ensure_ascii=False))
+    print("   content[0].text   :", r["result"]["content"][0]["text"])
+
+    print("\n── 反例:缺少 template_code → 原文校验错误 ──")
+    r = rpc({"jsonrpc": "2.0", "id": 11, "method": "tools/call",
+             "params": {"name": "start_video_creation", "arguments": {"document_id": "doc_123"}}})
+    print("   isError:", r["result"].get("isError"), "| error:", r.get("error"))
+
+    print("\n── 工具 schema 抽查(应为观察值) ──")
+    for t in tools:
+        if t["name"] == "start_video_creation":
+            print("  ", json.dumps(t["inputSchema"], ensure_ascii=False))
+
     print("\n── 错误路径 ──")
     r = rpc({"jsonrpc": "2.0", "id": 7, "method": "tools/call",
              "params": {"name": "no_such_tool", "arguments": {}}})

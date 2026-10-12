@@ -45,7 +45,33 @@ vcdmind.dev/mcp/internal/tools         # Catalog / Handler / *Args / objectSchem
 工具注册表:`tools.Catalog`;参数声明辅助函数:`objectSchema` / `stringProp` /
 `integerProp` / `enumProp`;参数结构体:`webSearchArgs`、`imageGenerateArgs`、
 `listTemplatesArgs`、`saveDocumentArgs`、`startVideoArgs`、`decodeManuscriptArgs`。
-错误路径:`unknown tool`、`unknown method`。
+错误路径:`unknown tool`、`unknown method`、`insufficient_balance`、`platform_failed`。
+
+### 参数 schema(观察值,已逐字段解出)
+
+方法是反汇编 `tools.Catalog`(6784 B),识别 `mapassign_faststr` 的键字面量与
+静态字符串头 `(ptr,len)`;轨迹见 `evidence/mcp-schema-trace.txt`,
+`start_video_creation` 的专项报告见 `evidence/mcp-tool-start_video_creation.md`。
+
+| 工具 | 参数(类型) | 说明原文 | required |
+| --- | --- | --- | --- |
+| `web_search` | `query`(string)、`max_results`(integer)、`time_range`(string) | "Search query" / "Maximum results, default 5" / "Optional time range such as week or month" | `query` |
+| `image_generate` | `prompt`(string)、`model`(string)、`size`(string)、`count`(integer) | "Image prompt" / "Optional platform image model code" / "Optional size such as 1024x1024" / "Number of images, default 1" | `prompt` |
+| `list_templates` | `keyword`、`category`、`platform`、`output_type`(均 string) | "Optional keyword" / "Optional category" / "Optional platform such as douyin" / "Optional output type such as mp4" | — |
+| `save_document` | `title`、`content`、`asset_type`(**enum: copywriting, script**)、`space_id` | "Document title" / "Markdown manuscript body" / "Asset type" / "Optional creation space id; omitted uses the personal space" | `title`,`content`,`asset_type` |
+| `start_video_creation` | `document_id`、`template_code`(均 string) | "Creation document id from save_document" / "Creation template code from list_templates" | `document_id`,`template_code` |
+
+4 个 schema 均含 `type=object`、`properties`、`required`、`additionalProperties=false`。
+
+### `start_video_creation` 的执行链(观察值)
+
+`tools.Handler.startVideoCreation`(2496 B)调用轨迹:
+`tools.decodeArgs` → `strings.TrimSpace` ×4 → `encoding/json.MarshalIndent`,
+随后 **POST `/api/creation/launches`**;本地校验文案 `document_id and template_code required`;
+返回 `api.Launch`(`model`/`count`/`documentId`/`sourceType`/`title`/`desktopUrl`)。
+桌面端同区字符串:`deep_link.create`、`vcdmind-create-launch`、`document_id=`、`template_code=`、
+`deep-link://new-url` → 深链 `vcdmind://create-launch?document_id=…&template_code=…`。
+**它本身不渲染视频**,只产出深链交给桌面应用继续。
 
 ## 关键否定结论
 

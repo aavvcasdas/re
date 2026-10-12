@@ -22,6 +22,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from urllib.parse import quote
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -106,6 +107,7 @@ def _skill_tools() -> list[dict]:
 
 
 def catalog() -> list[dict]:
+    """5 个平台工具。名称、描述、入参 schema 全部为**观察值**(见 evidence/mcp-tool-start_video_creation.md)。"""
     return [
         {
             "name": "web_search",
@@ -113,11 +115,12 @@ def catalog() -> list[dict]:
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "query": {"type": "string"},
-                    "max_results": {"type": "integer"},
-                    "time_range": {"type": "string"},
+                    "query": {"type": "string", "description": "Search query"},
+                    "max_results": {"type": "integer", "description": "Maximum results, default 5"},
+                    "time_range": {"type": "string", "description": "Optional time range such as week or month"},
                 },
                 "required": ["query"],
+                "additionalProperties": False,
             },
         },
         {
@@ -126,12 +129,13 @@ def catalog() -> list[dict]:
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "prompt": {"type": "string"},
-                    "size": {"type": "string"},
-                    "aspect_ratio": {"type": "string"},
-                    "count": {"type": "integer"},
+                    "prompt": {"type": "string", "description": "Image prompt"},
+                    "model": {"type": "string", "description": "Optional platform image model code"},
+                    "size": {"type": "string", "description": "Optional size such as 1024x1024"},
+                    "count": {"type": "integer", "description": "Number of images, default 1"},
                 },
                 "required": ["prompt"],
+                "additionalProperties": False,
             },
         },
         {
@@ -139,7 +143,13 @@ def catalog() -> list[dict]:
             "description": "List published vcdmind creation templates. Does not include paid prompts or workflow internals.",
             "inputSchema": {
                 "type": "object",
-                "properties": {"category": {"type": "string"}, "platform": {"type": "string"}},
+                "properties": {
+                    "keyword": {"type": "string", "description": "Optional keyword"},
+                    "category": {"type": "string", "description": "Optional category"},
+                    "platform": {"type": "string", "description": "Optional platform such as douyin"},
+                    "output_type": {"type": "string", "description": "Optional output type such as mp4"},
+                },
+                "additionalProperties": False,
             },
         },
         {
@@ -148,11 +158,15 @@ def catalog() -> list[dict]:
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "title": {"type": "string"},
-                    "content": {"type": "string"},
-                    "asset_type": {"type": "string", "enum": ["copywriting", "script"]},
+                    "title": {"type": "string", "description": "Document title"},
+                    "content": {"type": "string", "description": "Markdown manuscript body"},
+                    "asset_type": {"type": "string", "description": "Asset type",
+                                   "enum": ["copywriting", "script"]},
+                    "space_id": {"type": "string",
+                                 "description": "Optional creation space id; omitted uses the personal space"},
                 },
                 "required": ["title", "content", "asset_type"],
+                "additionalProperties": False,
             },
         },
         {
@@ -161,14 +175,53 @@ def catalog() -> list[dict]:
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "document_id": {"type": "string"},
-                    "template_code": {"type": "string"},
-                    "platform": {"type": "string"},
+                    "document_id": {"type": "string",
+                                    "description": "Creation document id from save_document"},
+                    "template_code": {"type": "string",
+                                      "description": "Creation template code from list_templates"},
                 },
-                "required": ["document_id"],
+                "required": ["document_id", "template_code"],
+                "additionalProperties": False,
             },
         },
     ] + (_skill_tools() if SKILL_TOOLS_ENABLED else [])
+
+
+def _skill_tools() -> list[dict]:
+    return [
+        {
+            "name": "list_skills",
+            "description": "列出本机技能库里的技能(只给元数据与文件清单路径,不给正文)。",
+            "inputSchema": {"type": "object", "properties": {}},
+        },
+        {
+            "name": "load_skill",
+            "description": "读取技能的目录清单;带 file 时只读那一个文件的正文。",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string", "description": "技能名"},
+                    "file": {"type": "string", "description": "技能目录内的相对路径(通常是 markdown)"},
+                },
+                "required": ["name"],
+            },
+        },
+        {
+            "name": "run_skill_script",
+            "description": "执行技能里的脚本(白名单扩展名 mjs/cjs/py/sh),不要把脚本源码读进对话。",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "skill": {"type": "string"},
+                    "script": {"type": "string"},
+                    "args": {"type": "array", "items": {"type": "string"}},
+                    "stdin": {"type": "string"},
+                    "timeoutMs": {"type": "integer"},
+                },
+                "required": ["skill", "script"],
+            },
+        },
+    ]
 
 
 # --------------------------------------------------------------------------- #
@@ -258,8 +311,19 @@ def call_tool(name: str, args: dict) -> dict:
         return ok("（桩实现)已保存到写作库", {"document": {"id": "doc_stub", "title": args.get("title")}})
 
     if name == "start_video_creation":
-        return ok("（桩实现)返回桌面深链", {"url": "vcdmind://create?document_id=doc_stub",
-                                            "documentId": "doc_stub"})
+        # 观察到的行为:trim 后两字段都必须非空,否则报原文错误;
+        # 随后 POST /api/creation/launches,返回 desktopUrl 深链(此处为桩)。
+        document_id = (args.get("document_id") or "").strip()
+        template_code = (args.get("template_code") or "").strip()
+        if not document_id or not template_code:
+            return fail("document_id and template_code required", "invalid_args")
+        deep_link = (f"vcdmind://create-launch?document_id={quote(document_id)}"
+                     f"&template_code={quote(template_code)}")
+        return ok(
+            json.dumps({"desktop_url": deep_link}, ensure_ascii=False),
+            {"desktop_url": deep_link, "document_id": document_id, "template_code": template_code,
+             "api": f"{cfg['api_base_url'].rstrip('/')}/api/creation/launches" if cfg['api_base_url'] else None},
+        )
 
     return fail(f"unknown tool: {name}", "unknown_tool")
 
