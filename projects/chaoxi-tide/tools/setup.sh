@@ -25,10 +25,14 @@ fi
 
 echo "== Chromium (@sparticuz/chromium) + puppeteer-core"
 cd "$TOOLCHAIN"
-[ -f package.json ] || npm init -y >/dev/null
+# npm refuses to initialise a package whose name is a dotfile directory (".toolchain"),
+# so write the manifest by hand instead of `npm init -y`.
+[ -f package.json ] || printf '{\n  "name": "render-toolchain",\n  "version": "1.0.0",\n  "private": true\n}\n' > package.json
 npm i --silent @sparticuz/chromium puppeteer-core
 
-if [ ! -x "$TOOLCHAIN/chrome-root/chrome" ]; then
+# chrome-root must hold the browser AND the software-GL libraries (libvk_swiftshader.so et al),
+# so the guard tests for both: a run that only unpacked the browser would render nothing.
+if [ ! -x "$TOOLCHAIN/chrome-root/chrome" ] || [ ! -f "$TOOLCHAIN/chrome-root/libvk_swiftshader.so" ]; then
   cat > extract.mjs <<'EOF'
 import chromium from '@sparticuz/chromium';
 import { mkdirSync, copyFileSync, readFileSync, writeFileSync, statSync } from 'node:fs';
@@ -46,7 +50,9 @@ for (const [name, dir] of [['al2023', 'al2023/lib'], ['swiftshader', 'chrome-roo
   const tar = `/tmp/${name}.tar`;
   writeFileSync(tar, zlib.brotliDecompressSync(readFileSync(src)));
   mkdirSync(`${root}/${dir}`, { recursive: true });
-  execFileSync('tar', ['-xf', tar, '-C', `${root}/${dir}`, '--strip-components=1`]);
+  // al2023 carries an `al2023/lib/...` prefix, the swiftshader tar is flat: strip only the former,
+  // or tar silently drops every member of the flat one (that is how this box lost software GL once).
+  execFileSync('tar', ['-xf', tar, '-C', `${root}/${dir}`, ...(name === 'al2023' ? ['--strip-components=1'] : [])]);
 }
 console.log('  chrome:', `${root}/chrome-root/chrome`, (statSync(`${root}/chrome-root/chrome`).size / 1048576).toFixed(0) + ' MB');
 EOF
@@ -57,6 +63,7 @@ chmod +x "$TOOLCHAIN/chrome-root/chrome"
 echo "== check"
 LD_LIBRARY_PATH="$TOOLCHAIN/al2023/lib" "$TOOLCHAIN/chrome-root/chrome" --version
 LD_LIBRARY_PATH="$TOOLCHAIN/al2023/lib" ldd "$TOOLCHAIN/chrome-root/chrome" 2>/dev/null | grep -c "not found" | sed 's/^/  missing libs: /'
+ls "$TOOLCHAIN/chrome-root"/libvk_swiftshader.so >/dev/null && echo "  software GL: ok ($(ls "$TOOLCHAIN"/chrome-root/*.so | wc -l) libs)"
 
 cat <<EOF
 
