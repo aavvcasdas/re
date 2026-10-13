@@ -1,0 +1,6 @@
+# local render toolchain (Chrome + ffmpeg, downloaded by start.py / tools/setup.sh)
+.toolchain/
+
+# python bytecode
+__pycache__/
+*.pyc
