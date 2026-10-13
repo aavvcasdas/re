@@ -31,7 +31,12 @@ python3 start.py --audio=~/song.mp3
 python3 start.py --workers=4     # 并行浏览器数(默认 3)
 ```
 
-Windows 用 `python start.py …`(或 `py start.py …`),macOS / Linux 用 `python3 start.py …`。
+Windows 用 `python start.py …`(或 `py start.py …`),macOS / Linux 用 `python3 start.py …`;
+
+- **Windows**:双击 `start.bat`(没装 Python 它会提示去哪儿装),或 `py start.py`
+- **macOS**:双击 `start.command`(第一次在 Finder 里右键 →「打开」),或 `python3 start.py`
+- **Linux**:`./start.command`,或 `python3 start.py`
+
 有 GPU 就走 GPU,没有会自动退回软件渲染;这个判断只探测一次并缓存(`.toolchain/render.json`),
 不会每次都慢。exe 需要在 Windows 上打包(PyInstaller 不能跨平台交叉编译),所以这里给的是
 py —— 任何装了 Python 3 的机器都能直接跑。
