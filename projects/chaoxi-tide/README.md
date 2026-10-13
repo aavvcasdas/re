@@ -1,5 +1,9 @@
 # 潮汐 — a hand-painted animation made in code
 
+![潮汐](docs/poster.jpg)
+
+![preview](docs/preview-dusk.gif) ![preview](docs/preview.gif)
+
 An animated short (165 s, 9 shots, 24 fps) made for the song **《潮汐 (Natural)》**
 (IN-K / 安苏羽 / 傅梦彤, 词 安苏羽 · 舒心, 93 BPM, 4/4).
 
