@@ -1,10 +1,10 @@
 // s9.js — 残月忧郁 星夜静谧 潮落叹息 (bars 56–64, 144.5–165.16 s)
 // The tide pools after the water has gone out. The low moon is in them, and so are the
-// stars. She comes to the biggest pool, and the two of them are in the water together —
+// stars. He comes to the biggest pool, and the two of them are in the water together —
 // then the moon goes in and only the sky is left.
 //
-// reads: ① the tide is out: pools stand on the sand, the moon and stars in each ② she comes
-//        to a pool and kneels to it; her reflection is beside the moon's ③ the wind takes the
+// reads: ① the tide is out: pools stand on the sand, the moon and stars in each ② he comes
+//        to a pool and kneels to it; his reflection is beside the moon's ③ the wind takes the
 //        surface; the moon slides out of the pool, and only the sky stays in it
 (() => {
   const [T0, T1] = SHOT(8), D = T1 - T0;
@@ -33,7 +33,7 @@
       const y = H * (.54 + .07 * i);
       paint(ellPts(W * (.3 + .18 * i), y, W * .34, H * .022, 26, 8), { wash: '#8C98AE', washOp: 120 - 16 * i, ink: null });
     }
-    // the pools: three small ones and the big one she kneels at
+    // the pools: three small ones and the big one he kneels at
     const pool2 = [[W * .16, H * .62, W * .075, H * .034], [W * .34, H * .86, W * .10, H * .042], [W * .82, H * .66, W * .055, H * .026]];
     for (let i = 0; i < pool2.length; i++) {
       const [cx, cy, rx, ry] = pool2[i];
@@ -72,15 +72,19 @@
       ln([[x - W * .010, y], [x + W * .010, y + jit(1.0)]], .45, '#CBD6E6', 'inkfine', .5);
     }
     for (let s = 0; s < 6; s++) { boilSeed('pst' + s); dotAt(pool[0] + (hash(s) - .5) * pool[2] * 1.6, pool[1] - pool[3] * .2 + (hash(s + 4) - .5) * pool[3] * .9, 1.0, '#EAF0FF', 140); }
-    // she comes to the pool and kneels; her shape doubles in the water beside the moon's
+    // he comes to the pool and kneels, turned to the water; his shape doubles in it beside the moon's
     const kx2 = lerp(W * .90, pool[0] - pool[2] * .62, arrive);
-    girl(pool[0] - pool[2] * .62, pool[1] + pool[3] * 1.02, H * .215, {
-      dress: '#C9C4D6', hair: '#2A2640', hairSway: .18, squat: .34, breath: 1,
-      armL: .55, armR: .5, head: .12, dark: '#363248',
+    const ky2 = lerp(H * .84, pool[1] + pool[3] * 1.02, arrive);
+    wanderer(kx2, ky2, H * .215, {
+      dress: '#C9C4D6', squat: .34, breath: 1, head: .12, dark: '#363248',
+      view: 'q', flip: true, eyes: 'look', lookY: .55, mouth: 'flat',
+      armL: .18 + .10 * arrive, armR: .16 + .10 * arrive,
     });
-    boilSeed('gref9');
-    paint(ellPts(pool[0] - pool[2] * .58, pool[1] + pool[3] * .30, pool[2] * .17, pool[3] * .34, 20, 2),
-          { wash: '#8E8CA8', washOp: 120 - 60 * wind, ink: null });
+    if (arrive > .02) {
+      boilSeed('gref9');
+      paint(ellPts(pool[0] - pool[2] * .58, pool[1] + pool[3] * .30, pool[2] * .17, pool[3] * .34, 20, 2),
+            { wash: '#8E8CA8', washOp: (120 - 60 * wind) * arrive, ink: null });
+    }
     camEnd();
     fadeIn(lt, .8, '#0C1124');
     irisOut(lt, D, 1.4, MX + H * .02, MY, '#0C1124');

@@ -1,9 +1,9 @@
 // s3.js — 夕阳下倒影 (bars 16–22, 41.3–56.8 s)
 // Close on the wet sand at sunset: the sun's reflection breaks into a ladder of light
-// across the shallow water; she walks through it, and it shatters and reforms around her.
+// across the shallow water; he walks through it, and it shatters and reforms around him.
 //
-// reads: ① the low sun and its reflection across the water ② she steps into the reflection
-//        ③ the reflection breaks under her feet and closes again behind her — she is the only one in it
+// reads: ① the low sun and its reflection across the water ② he steps into the reflection
+//        ③ the reflection breaks under his feet and closes again behind his — he is the only one in it
 (() => {
   const [T0, T1] = SHOT(2), D = T1 - T0;
   const hz = H * .30;
@@ -28,9 +28,9 @@
             { wash: '#FFF0D2', washOp: (70 + 60 * Math.sin(t * 1.5 + i * 1.7)) * (1 - .5 * brk), ink: null });
     }
     waves(t, hz, 3, { col: F.inkSoft, light: '#F8E4C6', amp: .7, sw: .8 });
-    // she walks through the light, seen from behind, small: a flat silhouette against it
-    girl(gx, gy, gu, { walk: frac(lt * 1.1), dress: '#EFE4D2', hair: '#3A3446', hairSway: .45 + .3 * Math.sin(lt * .8), armL: .2, armR: .26, lean: -.05, breath: 1, dark: F.ink });
-    // her own broken reflection under her feet
+    // he walks through the light, seen from behind, small: a flat silhouette against it
+    wanderer(gx, gy, gu, { walk: frac(lt * 1.1), dress: '#EFE4D2', armL: .2, armR: .26, lean: -.05, breath: 1, dark: F.ink });
+    // his own broken reflection under his feet
     boilSeed('gref');
     paint(ellPts(gx, gy + gu * .06, gu * .34, gu * .10, 14, 1.6), { wash: '#C7AE8A', washOp: 120, ink: null });
     camEnd();

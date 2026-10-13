@@ -152,74 +152,37 @@ function glitter(t, x, y0, y1, col = '#FFE9BE', k = 1) {
   }
 }
 
-// ---------- the girl ----------
-// Drawn from behind in flat washes + a few strokes. h = total height in px.
-// o: { view:'back'|'side', walk(0..1 phase)|null, lean, armL, armR, head, hair, squat, lie,
-//      breath, holding:null|'shell', scarf }
-function girl(x, y, h, o = {}) {
-  const u = h / 8;                                  // 8 units tall
-  const view = o.view || 'back', side = view === 'side' ? 1 : 0;
-  const lean = o.lean || 0, sq = o.squat || 0, br = o.breath || 0;
-  const ph = o.walk || 0;
-  const ink = F.ink, dark = o.dark || '#4A4256', hair = o.hair || '#3B3547';
-  // legs (strokes), the walk cycle drives them
-  const hipY = y - (3.1 * u), hipX = x + lean * u * .8;
-  const sw = Math.max(.5, h * .006);
-  for (const s of [-1, 1]) {
-    boilSeed('leg' + s);
-    const p = ph * TAU + (s > 0 ? Math.PI : 0);
-    const dx = Math.sin(p) * u * 1.15 * (o.walk ? 1 : .18), lift = Math.max(0, Math.sin(p)) * u * .35 * (o.walk ? 1 : 0);
-    ln([[hipX + s * u * .34, hipY - sq * u * .8], [hipX + dx * .5 + s * u * .3, y - lift - (y - hipY) * .38 - sq * u * .8],
-            [hipX + dx + s * u * .26, y - lift]], sw * 1.5, mixCol(ink, '#D9BFA0', .35), 'inkfine', .6);
-  }
-  // dress: one flat wash, slightly tapered, hem swinging with the step
-  boilSeed('dress');
-  const hemY = y - 2.55 * u - sq * u * .8, topY = y - 6.15 * u - sq * u * .9;
-  const sw2 = u * 1.15 + Math.abs(Math.sin(ph * TAU)) * u * .18 * (o.walk ? 1 : 0), hemX = x + lean * u * 1.1 + (o.walk ? Math.sin(ph * TAU) * u * .3 : 0);
-  paint(through([
-    [hipX - u * .95, topY], [hipX - u * 1.5, lerp(topY, hemY, .45)], [hemX - sw2, hemY],
-    [hemX, hemY + u * .3], [hemX + sw2, hemY],
-    [hipX + u * 1.5, lerp(topY, hemY, .45)], [hipX + u * .95, topY],
-  ], 4), { wash: o.dress || '#E4DCEA', ink: null });
-  // a thin shade down one side of the dress, and the hem edge
-  boilSeed('dressline');
-  ln([[hipX + u * .7, topY + u * .5], [hipX + u * 1.1, hemY - u * .4]], sw * .9, mixCol('#8E86A0', ink, .35), 'inkfine', .6);
-  boilSeed('hem');
-  ln([[hemX - sw2, hemY], [hemX - sw2 * .4, hemY + u * .22], [hemX + sw2 * .5, hemY + u * .16], [hemX + sw2, hemY]], sw * .8, mixCol('#8E86A0', ink, .3), 'inkfine', .6);
-  // arms (strokes) — swing opposite the legs
-  const shY = y - 5.9 * u - sq * u * .9;
-  const armA = [o.armL ?? .25, o.armR ?? .25];
-  for (const s of [-1, 1]) {
-    boilSeed('arm' + s);
-    const A = armA[s > 0 ? 1 : 0] + (o.walk ? Math.sin(ph * TAU + (s > 0 ? 0 : Math.PI)) * .5 : 0) + (br ? Math.sin(T * 1.2) * .03 : 0);
-    const sx = hipX + s * u * .95, sy = shY;
-    const ex = sx + s * u * (1.05 + Math.cos(A) * .10), ey = sy + u * (1.6 + A);
-    ln([[sx, sy], [lerp(sx, ex, .5) + s * u * .16, lerp(sy, ey, .5)], [ex, ey]], sw * 1.35, mixCol(ink, '#D9BFA0', .3), 'inkfine', .6);
-  }
-  // head + hair (washes)
-  const hy = shY - u * 1.35 - (o.head || 0) * u * .5, r = u * 1.25;
-  boilSeed('neck');
-  paint(ellPts(hipX + lean * u * .4, hy + r * .95, r * .4, r * .5, 10, .5), { wash: '#E7CDB2', ink: null });
-  boilSeed('head');
-  paint(ellPts(hipX + lean * u * 1.2, hy, r * (1 - side * .12), r * 1.06, 20, 1), { wash: '#EBD3B6', ink: null });
-  boilSeed('hair');
-  const hw = (o.hairW ?? 1) * r * 1.22, hsw = o.hairSway ?? 0;
-  paint(through([
-    [hipX + lean * u * 1.2 - hw, hy - r * .1],
-    [hipX + lean * u * 1.2 - hw * .8, hy - r * 1.15], [hipX + lean * u * 1.2, hy - r * 1.4],
-    [hipX + lean * u * 1.2 + hw * .8, hy - r * 1.1], [hipX + lean * u * 1.2 + hw, hy - r * .05],
-    [hipX + lean * u * 1.35 + hsw * u * .5, hy + r * 1.5], [hipX + lean * u * 1.2 + hw * .5 + hsw * u * .3, hy + r * 2.5],
-    [hipX + lean * u * 1.2 - hw * .6 + hsw * u * .2, hy + r * 2.3], [hipX + lean * u * 1.2 - hw * .95, hy + r * .9],
-  ], 5), { wash: hair, ink: null });
-  // two hair strands (strokes) that move in the wind
-  boilSeed('strand');
-  ln([[hipX + lean * u * 1.2 - hw * .9, hy + r * .4], [hipX + lean * u * 1.2 - hw * 1.1 - hsw * u, hy + r * 1.6], [hipX + lean * u * 1.1 - hw * .9 - hsw * u * 1.6, hy + r * 2.6]], sw * .8, mixCol(hair, '#8E86A0', .3), 'inkfine', .7);
-  if (side) {   // a hint of the face turned away
-    boilSeed('profile');
-    paint(ellPts(hipX + lean * u * 1.2 + r * .55, hy + r * .12, r * .18, r * .3, 8, .4), { wash: '#D9BFA0', ink: null });
-  }
-  if (o.holding === 'shell') { boilSeed('shell'); paint(heartPts(hipX + u * 2.05, shY + u * 1.5, u * .3), { wash: F.coral, ink: null }); }
-  if (o.tie) { boilSeed('tie'); paint(ellPts(hipX + u * 1.5, shY - u * .1, u * .22, u * .22, 8, .4), { wash: F.rose, ink: null }); }
+// ---------- the wanderer ----------
+// The film walks with Clawd (clawd.js): the protagonist, seen almost entirely from behind or in
+// three-quarter, because the sea is the other character and he keeps facing it.
+// `wanderer(x, y, h, o)` keeps the signature the nine shots were written against — x, y at the feet,
+// h = his height on screen in px, o = the old option bag — and maps it onto clawd():
+//   walk (a phase; the legs step)   -> clawd walk + a bob and counter-swinging arms
+//   squat / breath / lean / head    -> squash, a slow rise, a tilt about the feet, a nod
+//   dress / dark                    -> his body colour (dark = the night shots' ink tone)
+//   holding:'shell'                 -> the arms come up to cradle it (the shots draw the shell itself)
+//   view: back | qback | side | q | front, flip, plus eyes/mouth/lookX/lookY/blush/emote/tint and
+//   turn()-style spread ({ ...turn(...) } gives view + flip + smear for a drawn turn).
+const GIRL_VIEW = { front: 'front', q: 'q', qback: 'qback', side: 'side', back: 'back' };
+function wanderer(x, y, h, o = {}) {
+  const u = h / 8, sq = o.squat || 0, br = o.breath || 0, lean = o.lean || 0, hd = o.head || 0;
+  const wk = o.walk ?? null, step = wk != null ? Math.abs(Math.sin(wk * TAU)) : 0;
+  const col = o.dark || o.dress || PAL.clay;
+  const arms = o.holding ? [o.armL ?? .58, o.armR ?? .62] : null;
+  const opts = {
+    view: GIRL_VIEW[o.view] || 'qback', flip: o.flip, smear: o.smear, smearDir: o.smearDir,
+    boilKey: o.key || 'wanderer', walk: wk,
+    rot: lean * 1.15 + hd * .42 + (wk != null ? Math.sin(wk * TAU * 2) * .022 : 0),
+    dx: lean * 1.4,
+    dy: -(step * .5 + br * .10 * (1 + Math.sin(T * 1.25))),
+    sq: sq * .55,
+    aL: arms ? arms[0] : (o.armL ?? (wk != null ? .30 * Math.sin(wk * TAU) : -.12)),
+    aR: arms ? arms[1] : (o.armR ?? (wk != null ? -.30 * Math.sin(wk * TAU) : -.12)),
+    col, dk: mixCol(col, PAL.ink, .26), lt: mixCol(col, '#F5B394', .5),
+  };
+  for (const k of ['eyes', 'mouth', 'tint', 'tintK', 'blush', 'gloom', 'squint', 'lookX', 'lookY', 'emote', 'emoteK', 'emoteAge', 'lid', 'hat'])
+    if (o[k] != null) opts[k] = o[k];
+  clawd(x, y, u, opts);
 }
 
 // ---------- props ----------

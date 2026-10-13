@@ -22,31 +22,33 @@ of time, headless Chromium renders them, ffmpeg encodes them.
 ## The film
 
 One coast at nine hours of light — **dusk → sunset → night → before dawn → sunrise** —
-and a trail of footprints the sea keeps taking.
+and a trail of footprints the sea keeps taking. The one walking it is **Clawd**, the Claude Code
+mascot (`src/clawd.js`): blocky, four-legged, and kept three-quarters from behind until the moments
+that turn him round.
 
 | # | bars | s | shot | the read |
 |---|---|---|---|---|
-| 1 | 0–8 | 0–21 | 潮线 | she walks a trail of prints down the beach; the water takes the trail behind her |
-| 2 | 8–16 | 21–41 | 寻找昔日的足迹 | she runs the trail; it stops at a shell in the sand |
-| 3 | 16–22 | 41–57 | 夕阳下倒影 | she walks through the sun's reflection; it breaks under her and closes again |
-| 4 | 22–28 | 57–72 | 分享给大海秘密 | the shell to her ear; the water answers in rings and a line of light |
+| 1 | 0–8 | 0–21 | 潮线 | he walks a trail of prints down the beach; the water takes the trail behind his |
+| 2 | 8–16 | 21–41 | 寻找昔日的足迹 | he runs the trail; it stops at a shell in the sand |
+| 3 | 16–22 | 41–57 | 夕阳下倒影 | he walks through the sun's reflection; it breaks under him and closes again |
+| 4 | 22–28 | 57–72 | 分享给大海秘密 | the shell to his ear; the water answers in rings and a line of light |
 | 5 | 28–32 | 72–83 | 蓝色的海底 | the shell falls past the camera into the deep, the light closing overhead |
 | 6 | 32–40 | 83–103 | 远山的风景 | it drifts away between two far shores, and the shores pull apart |
-| 7 | 40–48 | 103–124 | 退守的爱情 | she draws two figures in the sand; a wave takes one of them |
-| 8 | 48–56 | 124–145 | 疯狂的寻觅你的身影 | she crosses the night beach with a lamp, and the sea takes her own prints |
-| 9 | 56–64 | 145–165 | 残月忧郁 星夜辽阔 | the moon in every tide pool; she kneels at one, the wind takes the surface, the moon goes out of the water |
+| 7 | 40–48 | 103–124 | 退守的爱情 | he draws two figures in the sand; a wave takes one of them |
+| 8 | 48–56 | 124–145 | 疯狂的寻觅你的身影 | he crosses the night beach with a lamp, and the sea takes his own prints |
+| 9 | 56–64 | 145–165 | 残月忧郁 星夜辽阔 | the moon in every tide pool; he kneels at one, the wind takes the surface, the moon goes out of the water |
 
 Full shot-by-shot plan with each shot's timed **reads**: [`STORYBOARD.md`](STORYBOARD.md).
 
 ## Watch it
 
-- **`out/video.mp4`** — the film, committed in this repository (45.9 MB, rendered by
+- **`out/video.mp4`** — the film, committed in this repository (47.1 MB, 165.2 s, rendered by
   `node render.mjs --encode`). It is the exact file to watch; it is also the file that
   would be attached to a GitHub Release (the sandbox this was rendered in cannot reach
   `uploads.github.com`, so the asset could not be uploaded from here — the file is in the
   repo instead).
 
-**Это version is silent.** The song is someone else's work, so its audio is not
+**This version is silent.** The song is someone else's work, so its audio is not
 redistributed here. To hear the film with the song, put your own copy in `assets/song.mp3`
 and re-encode the frames:
 
@@ -72,7 +74,7 @@ node render.mjs --encode --audio=assets/song.mp3 --out=out/video.mp4           #
 
 | path | what |
 |---|---|
-| `src/scenes/_lib.js` | the film's art vocabulary: palette, coast, waves, footprints, her, the shell, transitions |
+| `src/scenes/_lib.js` | the film's art vocabulary: palette, coast, waves, footprints, the shell, transitions, and `wanderer()` — the shots' entry point into the character kit |
 | `src/scenes/s1.js … s9.js` | one file per shot — the shots *are* the film |
 | `src/core.js`, `clawd.js`, `timeline.js` | the kit's engine (see the note above) + this film's two render fixes |
 | `assets/fonts/` | bundled subsets of Ma Shan Zheng (the brush CJK face for the sky and the sand is drawn, not typed — the font is only used by the UI) + the UI faces |
@@ -84,8 +86,8 @@ A 960×540 frame costs ~1.6 s of CPU on SwiftShader. `src/core.js` carries the t
 that made a 3965-frame film affordable, and `tools/README-perf.md` has the measurements:
 **cost is the number of brush dabs, not pixels**, so backgrounds are flat `wash` shapes and
 only edge work uses strokes; and `canvas.toDataURL()` costs 3 s per frame versus 14 ms for
-`getImageData` + `toBlob`. The character is painted from flat shapes instead of the kit's
-stock mascot (8.9 s/frame → 0.2 s).
+`getImageData` + `toBlob`. The protagonist *is* the kit's `clawd()`: `PROJECT.flat` (`src/config.js`)
+folds each watercolour `fill` into the wash under it, which takes him from ~8.9 s a frame to ~1.4 s.
 
 ## Folders
 

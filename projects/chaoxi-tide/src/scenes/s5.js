@@ -1,5 +1,5 @@
 // s5.js — 蓝色的海底 (bars 28–32, 72.3–82.6 s)
-// Under the surface. The shell she let go of sinks past the camera, turning slowly, and
+// Under the surface. The shell he let go of sinks past the camera, turning slowly, and
 // keeps falling into deeper blue while the light above shrinks to a coin.
 //
 // reads: ① we are underwater: blue, light shafts, the surface overhead ② the shell falls past us,
@@ -30,7 +30,7 @@
     boilSeed('surface');
     bandEdgeUp(-60, W + 60, u => H * .062 + 7 * Math.sin(u * 2.6 + t * .9), '#EAF8F4', 9, 2, 250);
     for (let i = 0; i < 6; i++) { boilSeed('surf' + i); waveline(t * 1.2, H * .058 + i * 5, 4, i * 1.7, '#FBFEFB', .9, 4); }
-    // the coin of light that stays with her
+    // the coin of light that stays with his
     boilSeed('coin');
     paint(ellPts(W * .52, H * .035, W * .085 * (1 - .35 * fall), H * .022 * (1 - .35 * fall), 22, 3), { wash: '#FFFDF0', washOp: 190, ink: null });
     glow(W * .52, H * .03, W * .22 * (1 - .25 * fall), '#EAF6E4', .30 * (1 - .5 * fall));
@@ -40,7 +40,7 @@
     glow(sx - sr * .4, sy - sr * .5, sr * 2.6, '#BFE3E6', .18);          // it is lit from above
     scallop(sx, sy, sr, Math.sin(rot) * 1.1 + fall * 2.2,
             { col: mixCol('#F5B49A', '#8E5A50', .15 + .55 * fall), ridge: mixCol('#E0937A', '#4E4050', .5 * fall), key: '5' });
-    // her bubbles: they rise from the shell as it falls
+    // his bubbles: they rise from the shell as it falls
     if (fall > .05) for (let i = 0; i < 7; i++) {
       boilSeed('bub' + i);
       const u = frac(fall * (1 + .3 * hash(i)) + hash(i + 2));

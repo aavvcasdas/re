@@ -1,9 +1,9 @@
 // s7.js — 退守的爱情 / 还剩下回忆 (bars 40–48, 103.25–123.9 s)
-// Back on the beach, night. She draws two figures in the wet sand with a stick; a wave
-// comes up the beach and takes one of them; she is left with the other.
+// Back on the beach, night. He draws two figures in the wet sand with a stick; a wave
+// comes up the beach and takes one of them; he is left with the other.
 //
-// reads: ① night beach, she is kneeling in the wet sand drawing ② two figures stand in the sand
-//        ③ the water slides up and erases one ④ she looks at what is left, and the tide keeps coming
+// reads: ① night beach, he is kneeling in the wet sand drawing ② two figures stand in the sand
+//        ③ the water slides up and erases one ④ he looks at what is left, and the tide keeps coming
 (() => {
   const [T0, T1] = SHOT(6), D = T1 - T0;
   const hz = H * .40;
@@ -29,7 +29,7 @@
     boilSeed('foam7');
     bandEdge(-60, W + 60, u => fy + 7 * Math.sin(u * 3.3 + t * .4) + jit(3), '#D8E3EE', 9, 2, 140 + 70 * (wash1 + wash2) * .5);
     for (let i = 0; i < 2; i++) { boilSeed('foam7l' + i); waveline(t, fy + 3 + i * 5, 2.4, i * 2.3, '#EAF1F8', .9, 4); }
-    // the two figures she draws: stick lines in the sand
+    // the two figures he draws: stick lines in the sand
     const fig = (c, k, x, y) => {
       if (k <= .01) return;
       boilSeed('fig' + c);
@@ -47,10 +47,10 @@
       boilSeed('eraseB');
       paint(ellPts(dB[0], dB[1] - H * .028, W * .13 * ease(wash1), H * .105 * ease(wash1), 24, 7), { wash: '#CBD8E6', washOp: 130 * ease(wash1), ink: null });
     }
-    // she kneels left of the drawing with the stick, and stays looking at what is left
+    // he kneels left of the drawing with the stick, and stays looking at what is left
     const gx = lerp(W * .30, W * .345, draw), gy = H * .80;
-    girl(gx, gy, H * .275, {
-      dress: '#DCD6E2', hair: '#2E2A3E', hairSway: .22, squat: .30 - .06 * draw, breath: 1,
+    wanderer(gx, gy, H * .275, {
+      dress: '#DCD6E2', squat: .30 - .06 * draw, breath: 1,
       armL: .85 - .55 * draw, armR: .30, head: -.10 + .12 * wash1, dark: '#3A3648',
     });
     boilSeed('stick');

@@ -1,9 +1,9 @@
 // s2.js — 寻找昔日的足迹 (bars 8–16, 20.65–41.3 s)
-// The trail again, seen from a higher, closer angle: she runs along it, catching up to
-// the footprints she made; at the end she stops at a shell half-buried in the sand.
+// The trail again, seen from a higher, closer angle: he runs along it, catching up to
+// the footprints he made; at the end he stops at a shell half-buried in the sand.
 //
-// reads: ① a line of prints crossing the frame ② she runs in after them, shrinking toward them
-//        ③ the prints stop: she stops, kneels, and takes a shell out of the sand
+// reads: ① a line of prints crossing the frame ② he runs in after them, shrinking toward them
+//        ③ the prints stop: he stops, kneels, and takes a shell out of the sand
 (() => {
   const [T0, T1] = SHOT(1), D = T1 - T0;
   const hz = H * .40;
@@ -29,17 +29,19 @@
     prints(trail.map(p => [p[0], p[1], p[2]]), 0,
            { s: W * .0026, col: '#9E7F55', showDead: true, op: 240,
              born: { t: lt, t0: .2, t1: 3.4, at: trail.map((p, i) => i / 11) } });
-    // she runs along the line, from behind: legs wide, hair back, dress lifting
-    girl(px, py, Math.max(H * .105, psz * 13), {
-      walk: frac(lt * 1.5), dress: '#EFE2CC', hair: '#3C3548', hairSway: .7 + .4 * Math.sin(lt * 1.1),
-      armL: .5, armR: .62, lean: -.12 - .10 * (1 - kneel), breath: 1, squat: kneel * .6,
+    // he runs along the line, seen from three-quarters behind — legs wide, arms going — and turns on the
+    // spot as he kneels: the shell comes up out of the sand into his arms
+    wanderer(px, py, Math.max(H * .105, psz * 13), {
+      walk: frac(lt * 1.5), dress: '#EFE2CC', lean: -.12 - .10 * (1 - kneel), breath: 1, squat: kneel * .6,
       holding: kneel > .55 ? 'shell' : null,
+      ...turn(lt, D * .62, D * .80, .5, .125),
+      eyes: kneel > .5 ? 'happy' : 'normal', mouth: 'smile',
     });
-    // the shell she finds: it fades in under her hands as she kneels
+    // the shell he finds: it fades in under his hands as he kneels
     if (kneel > .3) {
       boilSeed('shell');
       const k = ease(seg(kneel, .3, .95)), sx = W * .615, sy = H * .705;
-      scallop(sx, sy, W * .0058 * (.5 + k), .2, { col: mixCol('#F0A98E', '#EFD6B4', 1 - k), key: '2', ridges: k > .6 });
+      scallop(sx, sy, W * .0105 * (.5 + k), .2, { col: mixCol('#F0A98E', '#EFD6B4', 1 - k), key: '2', ridges: k > .6 });
       glow(sx, sy, W * .020 * k, '#FFD9A0', .25 * k);
     }
     gull(t * 1.3, W * (.30 - .06 * seg(lt, 0, D)), hz - H * .16, W * .009, { flap: 4.8 });

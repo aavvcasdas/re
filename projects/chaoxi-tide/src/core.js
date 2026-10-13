@@ -23,7 +23,7 @@ const jit = a => (random() * 2 - 1) * a;
 // that re-boil every frame (jitter). boilSeed(key) restarts the stream from the boil frame and a key (any string or
 // number) that's the same every frame: call it before each separate element. clawd() does this for itself and its parts.
 let BOILN = 0, CLAWD_N = 0;
-const boilSeed = key => { let h = 2166136261; for (const c of key + '|' + BOILN) h = Math.imul(h ^ c.charCodeAt(0), 16777619); randomSeed(h >>> 0); };
+const boilSeed = key => { window.__lastSeed = key; let h = 2166136261; for (const c of key + '|' + BOILN) h = Math.imul(h ^ c.charCodeAt(0), 16777619); randomSeed(h >>> 0); };
 
 // ---------- timing helpers (everything is a pure function of t; no state survives between frames) ----------
 const seg = (t, a, b) => clamp((t - a) / (b - a));                 // 0..1 progress of t through [a, b]
@@ -179,11 +179,32 @@ function centred(pts, draw) {
   if (!pts.length) return;
   let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
   for (const [x, y] of pts) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  // One NaN or Infinity in a path travels into p5.brush's mask canvas, which refuses a non-integer size — and the
+  // frame dies deep inside the library with nothing to say which paint did it. Skip the shape and name it instead.
+  if (!isFinite(x0 + x1 + y0 + y1)) {
+    if (!window.__nanWarned) { window.__nanWarned = 1; console.warn('paint(): non-finite shape skipped — last boilSeed: ' + (window.__lastSeed || '?')); }
+    return;
+  }
   const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
   push(); translate(cx, cy); draw(pts.map(([x, y]) => [x - cx, y - cy])); pop();
 }
 function paint(pts, o = {}) { centred(pts, (P) => paintAt(P, o)); }
+// FLAT mode (PROJECT.flat): the film stars Clawd, and the character kit is full of watercolour `fill` shapes —
+// the most expensive thing the brush can do (3.2 s each, see tools/README-perf.md), which puts `clawd()` at
+// ~8.9 s/frame and a full film out of reach. Flat mode folds each fill (and hatch) into the wash instead: one
+// shape, one colour, mixed to what the two layers would have averaged. Same silhouette, same palette, ~1/7 the cost.
+const FLAT = !!PROJECT.flat;
 function paintAt(pts, o) {
+  if (FLAT) {
+    if (o.fill) {
+      const op = (o.fillOp ?? 170) / 255;
+      // fill over a wash: the two layers mixed. Fill alone (a highlight, a shadow band): a thin wash, thinned
+      // further, because the watercolour fill it replaces is textured and this is one flat tone.
+      o = { ...o, fill: 0, wash: o.wash ? mixCol(o.wash, o.fill, op) : o.fill, washOp: o.wash ? (o.washOp ?? 255) : (o.fillOp ?? 170) * .65 };
+    }
+    if (o.hatch) o = { ...o, hatch: 0 };
+    if (o.sw > 1.5) o = { ...o, sw: 1.5 };
+  }
   if (o.wash || o.fill || o.hatch) {
     if (o.wash) brush.wash(o.wash, o.washOp ?? 255); else brush.noWash();
     if (o.fill) { brush.fill(o.fill, o.fillOp ?? 170); brush.fillBleed(o.bleed ?? .1); brush.fillTexture(o.tex ?? .4, o.border ?? .35); } else brush.noFill();
@@ -199,6 +220,7 @@ function paintAt(pts, o) {
   }
 }
 function inkLine(pts, sw = 1, col = PAL.ink, br = 'ink', curv = .5) {
+  if (FLAT && sw > 1.5) sw = 1.5;   // stroke cost is path length ÷ spacing: weight is what makes a stroke expensive
   centred(pts, (P) => { brush.noFill(); brush.noWash(); brush.noHatch(); brush.set(br, col, sw); brush.spline(P, curv); });
 }
 
