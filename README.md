@@ -92,8 +92,11 @@ The painted-animation engine and guide are adapted from [ClaudeAnimationBase](ht
 
 MIT. See [LICENSE](LICENSE).
 
-## Added project: Claude Code birthday lyric video
+## Added lyric-video projects
 
-This checkout also contains a short, procedural birthday lyric video starring Clawd. The Python renderer, storyboard, instructions and font licenses are in [`projects/claude-birthday/`](projects/claude-birthday/). The standalone renderer produces a 720p MP4, includes a synthesized instrumental by default (no vocals), and accepts a local recording with `--audio`.
+This checkout includes two standalone, locally renderable Python lyric videos starring Clawd:
+
+- [`projects/claude-birthday/`](projects/claude-birthday/) — a short birthday video with renderer, storyboard, font licenses and preview.
+- [`projects/tide-and-echo/`](projects/tide-and-echo/) — a Chinese coastal-memory lyric film with renderer, storyboard, tests, font licenses and preview. Its default track is original ambient instrumental audio, not a supplied source-song melody.
 
 The full upstream `painted-animation` skill is retained in `skills/painted-animation/` and installed as a repo-local Claude Code skill in `.claude/skills/painted-animation/`.
