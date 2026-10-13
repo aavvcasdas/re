@@ -12,7 +12,8 @@ projects/chaoxi-tide/     ← 影片本体(分镜、镜头代码、素材、工�
 
 - 分镜与每镜的"读点":[`projects/chaoxi-tide/STORYBOARD.md`](projects/chaoxi-tide/STORYBOARD.md)
 - 项目说明 / 复现步骤 / 版权说明:[`projects/chaoxi-tide/README.md`](projects/chaoxi-tide/README.md)
-- 成片:`projects/chaoxi-tide/out/video.mp4`,同一文件也发布在 Releases
+- 成片:**`projects/chaoxi-tide/out/video.mp4`**(45.9 MB,已随仓库提交;
+  本沙箱访问不到 `uploads.github.com`,所以无法作为 Release 附件上传,直接入库)
 
 **Skill 来源**:`painted-animation` by **tuzhechen2005**(仓库 `tuzhechen2005/opus-video-skills`,
 技能目录 `skills/painted-animation/`),引擎来自 **John Heibel** 的

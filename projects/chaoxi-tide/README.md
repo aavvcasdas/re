@@ -40,8 +40,11 @@ Full shot-by-shot plan with each shot's timed **reads**: [`STORYBOARD.md`](STORY
 
 ## Watch it
 
-- `out/video.mp4` — the film (rendered by `node render.mjs --encode`).
-- The release asset on this repository's Releases page is the same file.
+- **`out/video.mp4`** — the film, committed in this repository (45.9 MB, rendered by
+  `node render.mjs --encode`). It is the exact file to watch; it is also the file that
+  would be attached to a GitHub Release (the sandbox this was rendered in cannot reach
+  `uploads.github.com`, so the asset could not be uploaded from here — the file is in the
+  repo instead).
 
 **Это version is silent.** The song is someone else's work, so its audio is not
 redistributed here. To hear the film with the song, put your own copy in `assets/song.mp3`
