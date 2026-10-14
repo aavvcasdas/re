@@ -11,8 +11,8 @@
 //        ④ 32.4–33.3 it grows past the frame  ·  match cut: the picture becomes the sea
 (() => {
   const [T0, T1] = SHOT(4), D = T1 - T0;
-  const COLS = 4, ROWS = 3, CW = 104, CH = 78;             // 416 × 234 of picture
-  const CX = 480, CY = 246;
+  const COLS = 4, ROWS = 3, CW = 128, CH = 96;             // 512 × 288 of picture
+  const CX = 480, CY = 240;
   const cellAt = i => [CX - COLS * CW / 2 + (i % COLS) * CW + CW / 2, CY - ROWS * CH / 2 + Math.floor(i / COLS) * CH + CH / 2];
   const SNAP = i => 23.95 + i * BEAT;                      // a piece home on every beat
   const DONE = SNAP(COLS * ROWS - 1) + .3;
@@ -24,7 +24,7 @@
     boilSeed('pic' + i);
     if (r === 0) {
       slab(x - CW / 2, y - CH / 2, CW, CH, SC.skyHi, 1, op);
-      if (c === 3) paint(ellPts(x + CW * .18, y - CH * .1, 17, 17, 18, 1), { wash: SC.sun, washOp: op, ink: null });
+      if (c === 3) paint(ellPts(x + CW * .18, y - CH * .1, 21, 21, 18, 1), { wash: SC.sun, washOp: op, ink: null });
       if (c === 1) paint(ellPts(x - 10, y - 12, 22, 7, 12, 1.6), { wash: SC.cream, washOp: op * .8, ink: null });
     } else if (r === 1) {
       slab(x - CW / 2, y - CH / 2, CW, CH * .5, SC.skyLo, 1, op);
@@ -34,15 +34,15 @@
     } else {
       slab(x - CW / 2, y - CH / 2, CW, CH * .45, SC.seaLt, 1, op);
       slab(x - CW / 2, y - CH * .05, CW, CH * .55, SC.sand, 1, op);
-      if (c === 1) { dotAt(x - 8, y + CH * .12, 15, PAL.clay, op); dotAt(x - 8, y - CH * .14, 9, PAL.clay, op); }
-      if (c === 2) { dotAt(x + 10, y + CH * .14, 14, SC.you, op); dotAt(x + 10, y - CH * .12, 8.5, SC.you, op); }
+      if (c === 1) { dotAt(x - 10, y + CH * .12, 18, PAL.clay, op); dotAt(x - 10, y - CH * .16, 11, PAL.clay, op); }
+      if (c === 2) { dotAt(x + 12, y + CH * .14, 17, SC.you, op); dotAt(x + 12, y - CH * .14, 10, SC.you, op); }
       if (c === 3) paint(starPts(x + 6, y - CH * .18, 5, .32, 4), { wash: SC.gold, washOp: op * .9, ink: null });
     }
   }
 
   shots([[T0, (t, lt) => {
     const done = seg(t, DONE, DONE + .5), grow = easeIn(seg(t, 32.45, T1));
-    camBegin(CX, CY + 6 * Math.sin(t * .5), lerp(1.06, .98, ease(seg(lt, 0, 3))));
+    camBegin(CX, CY + 6 * Math.sin(t * .5), lerp(1.12, 1.02, ease(seg(lt, 0, 3))));
 
     // the dark of the room behind the montage: walls, the lamp's glow, a little dust
     room(t, { window: false, frame: false, lampK: .55 });

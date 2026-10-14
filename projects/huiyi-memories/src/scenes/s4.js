@@ -11,6 +11,7 @@
   const [T0, T1] = SHOT(3), D = T1 - T0;
   const U = 30, MX = 600, MY = 470;
   const CATCH = B(30), HARD = B(31);                       // 19.614 / 20.247
+  const HOLD = [MX - 4.7 * U, MY - 5.9 * U];               // where the caught fragment lives: beside his face, not on it
 
   shots([[T0, (t, lt) => {
     const k = easeIn(seg(t, 18.35, CATCH));                // 0 until it launches, 1 when he has it
@@ -41,13 +42,13 @@
                        dy: (mood.dy || 0) - .2 * pulse(t, 7), boilKey: 'me' });
     // the one fragment worth catching: arcs in, then sits in both hands and goes up with them
     if (held < .999) {
-      const px = lerp(980, MX - 3.4 * U, k), py = lerp(60, MY - 6.4 * U, k) - Math.sin(k * Math.PI) * 90;
+      const px = lerp(980, HOLD[0], k), py = lerp(60, HOLD[1], k) - Math.sin(k * Math.PI) * 90;
       frag(t, px, py, lerp(30, 62, k), lerp(2.2, -.2, k), 21, { col: SC.frag, edge: true, ink: SC.inkSoft, sw: 1.1 });
       if (k > .1) ln([[980, 60], [px, py]], .8, SC.fragLt, 'inkfine', .12);   // the trail it came in on
     } else {
-      frag(t, MX - 3.4 * U, MY - 6.4 * U - pulse(t, 31) * 3, 62, -.2 + Math.sin(t * 1.4) * .04, 21,
+      frag(t, HOLD[0], HOLD[1] - pulse(t, 31) * 3, 62, -.2 + Math.sin(t * 1.4) * .04, 21,
            { col: SC.frag, edge: true, ink: SC.inkSoft, sw: 1.1 });
-      glow(MX - 3.4 * U, MY - 6.4 * U, 130, '#FFD9A0', .3);
+      glow(HOLD[0], HOLD[1], 130, '#FFD9A0', .3);
     }
     floorScene(t, { boxK: .55, scraps: 4, lamp: .8 });
     camEnd();
@@ -55,7 +56,7 @@
     flash((1 - seg(lt, 0, .35)) * .9, SC.cream);           // in: the smash's white head
     const g = seg(lt, D - .5, D);                          // out: the caught fragment takes the frame
     if (g > 0) {
-      const [hx, hy] = toScreen(MX - 3.4 * U, MY - 6.4 * U, LAST_CAM);
+      const [hx, hy] = toScreen(HOLD[0], HOLD[1], LAST_CAM);
       frag(t, lerp(hx, W / 2, ease(g)), lerp(hy, H / 2, ease(g)), lerp(62, 1400, easeIn(g)), lerp(-.2, 0, g), 21,
            { col: SC.frag, edge: g > .3, ink: null });
     }
