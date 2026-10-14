@@ -5,6 +5,8 @@ A hand-painted p5.js / p5.brush animation for 《把回忆拼好给你》 (cici_
 exactly 31 bars of the beat at 94.82 bpm — cut on bar lines, with every lyric line of the LRC
 beat-snapped and sung on screen as a torn paper slip.
 
+**The finished film is in the repo: [film.mp4](film.mp4)** (78.9 s, 960×540 @ 24 fps, with the beat).
+
 **The one image the film is built on:** a room with a cold moon-window on the left and one warm
 lamp on the right, and between them a box of torn paper. Every memory in the song is a fragment of
 paper; the film is him gathering them, and the title is the plot — *把回忆拼好给你*: he assembles
