@@ -26,11 +26,17 @@
     beach(t, SAND, { grey });
 
     // 你, at the water's edge, pointing the whole sea out to him
-    const aRy = kf(t, [[T0, .1], [POINT, .1], [POINT + .5, 1.35], [37.4, 1.30], [T1, .5]]);
+    const aRy = kf(t, [[T0, .1], [POINT, .1], [POINT + .5, 1.45], [37.4, 1.40], [T1, .5]]);
     you(322, 470, 24, { view: 'q', flip: false, aR: aRy, aL: -.3,
                         ...emotions(t, [[T0, 'happy'], [POINT, 'happy', { lookX: .9, lookY: -.5 }]]),
                         armR: (u, sw) => { boilSeed('youhand'); paint(ellPts(0, 0, u * .55, u * .45, 10, 1.4), { wash: SC.you, ink: SC.ink, sw: sw * .6 }); },
                         boilKey: 'you' });
+    // a gold tick at the pointing fingertip, pulsing on the beat: "there — all of it"
+    const pk = seg(t, POINT + .1, POINT + .4) * (1 - seg(t, 37.2, 37.7));
+    if (pk > .02) {
+      boilSeed('pointtick');
+      paint(starPts(452, 302, 7 + 4 * pulse(t, 54), .3, 4), { wash: SC.sun, washOp: 220 * pk, ink: null });
+    }
     // him, a step back and turned toward 你 — the sea is not what he came to look at
     const mood = emotions(t, [[T0, 'happy', { lookX: .3, lookY: .1 }], [LOOK, 'happy', { lookX: 1.0, lookY: .15 }]]);
     clawd(648, 474, 24, { ...mood, view: 'q', flip: true, aL: -.35, aR: -.5 + .05 * Math.sin(t * 1.2),
