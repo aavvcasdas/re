@@ -1,2 +1,7 @@
-node_modules
-out/
+node_modules/
+out/frames/
+out/check/
+out/stills/
+out/loop_*/
+out/render.log
+.DS_Store

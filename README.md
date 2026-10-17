@@ -1,6 +1,6 @@
-# 用代码手绘的两部动画短片
+# 用代码手绘的动画短片
 
-两部完全由代码逐帧绘制的短片:**平涂水粉块面 + 细笔水墨线条 + 纸纹**,按歌曲的小节网格
+几部完全由代码逐帧绘制的短片:**平涂水粉块面 + 细笔水墨线条 + 纸纹**,按歌曲的小节网格
 编排。没有生成模型、没有剪辑软件、没有素材库:`p5.js` + `p5.brush` 把每一帧写成时间的
 纯函数,无头 Chromium 渲染,ffmpeg 编码。
 
@@ -8,12 +8,15 @@
 |---|---|---|---|
 | **潮汐** | 《潮汐 (Natural)》— IN-K / 安苏羽 / 傅梦彤,93 BPM,4/4 | 2:45,9 个镜头 | [`projects/chaoxi-tide/out/video.mp4`](projects/chaoxi-tide/out/video.mp4),47 MB |
 | **生日快乐** | 《生日快乐》(Happy Birthday) | 0:36,6 个镜头 | [`projects/happy-birthday/out/video.mp4`](projects/happy-birthday/out/video.mp4),17 MB |
+| **把回忆拼好给你** | 椰子水很甜《把回忆拼好给你(纯享Beat)》,95 BPM,4/4 | 2:22,28 个镜头 | [`projects/huiyi/out/video.mp4`](projects/huiyi/out/video.mp4),38 MB |
 
-两部片的主角都是 **Clawd** —— 引擎自带角色库里的方盒子(`src/clawd.js`,同一套代码画出了
+片的主角都是 **Clawd** —— 引擎自带角色库里的方盒子(`src/clawd.js`,同一套代码画出了
 `projects/chaoxi-tide/docs/views.jpg` 与 `projects/chaoxi-tide/docs/emotions.jpg` 那两张模型表)。
+《把回忆拼好给你》是第一部带 **卡拉 OK 唱词** 的片(逐字金色填充,`projects/huiyi/src/karaoke.js`)。
 
 ![潮汐](projects/chaoxi-tide/docs/poster.jpg)
 ![生日快乐](projects/happy-birthday/docs/poster.jpg)
+![把回忆拼好给你](projects/huiyi/docs/poster.jpg)
 
 ## 在自己机器上渲染(`start.py`)
 
@@ -47,11 +50,12 @@ py —— 任何装了 Python 3 的机器都能直接跑。
 start.py                            本地渲染包(见上)
 projects/chaoxi-tide/               《潮汐》:分镜、九个镜头的代码、素材、成片
 projects/happy-birthday/            《生日快乐》:六个镜头的代码、素材、成片
+projects/huiyi/                     《把回忆拼好给你》:28 镜头歌词 MV,卡拉 OK 唱词
 .claude/skills/painted-animation/   所用的 skill(上游 MIT,见其 LICENSE)
 ```
 
-- 分镜与每镜的「读点」:[潮汐](projects/chaoxi-tide/STORYBOARD.md)
-- 复现步骤 / 渲染与版权说明:[潮汐](projects/chaoxi-tide/README.md) · [生日快乐](projects/happy-birthday/README.md)
+- 分镜与每镜的「读点」:[潮汐](projects/chaoxi-tide/STORYBOARD.md) · [把回忆拼好给你](projects/huiyi/STORYBOARD.md)
+- 复现步骤 / 渲染与版权说明:[潮汐](projects/chaoxi-tide/README.md) · [生日快乐](projects/happy-birthday/README.md) · [把回忆拼好给你](projects/huiyi/README.md)
 
 **Skill 来源**:`painted-animation` by **tuzhechen2005**(仓库 `tuzhechen2005/opus-video-skills`,
 技能目录 `skills/painted-animation/`),引擎来自 **John Heibel** 的
