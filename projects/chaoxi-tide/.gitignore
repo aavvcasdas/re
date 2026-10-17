@@ -3,5 +3,5 @@ out/frames/
 out/check/
 out/stills/
 out/loop_*/
+out/render.log
 .DS_Store
-node_modules

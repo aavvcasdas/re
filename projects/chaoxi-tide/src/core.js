@@ -296,10 +296,10 @@ function defineBrushes() {
 
 // ---------- frame ----------
 async function setup() {
-  createCanvas(W, H, WEBGL); pixelDensity(1); noLoop();
+  createCanvas(W, H, WEBGL); pixelDensity(.75); noLoop();
   brush.scaleBrushes(5); defineBrushes();
   paperG = makePaper(); grainC = makeGrain(); glowTex = makeGlowTex(); letG = createGraphics(W, H); letG.pixelDensity(1);
-  outC = document.getElementById('out'); outX = outC.getContext('2d');
+  outC = document.getElementById('out'); outX = outC.getContext('2d', { willReadFrequently: true });
   await Promise.all([document.fonts.load('100px "Permanent Marker"'), document.fonts.load('800 50px "Shantell Sans"'), ...(window.EXTRA_FONTS || []).map(([f, txt]) => document.fonts.load(f, txt))]);
   window.ready = true;
   if (!location.search.includes('render')) devUI();

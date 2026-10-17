@@ -54,7 +54,7 @@ node render.mjs --encode --out=out/video.mp4 --audio=assets/song.mp3 [--fps=12] 
 
 ### 这台机器上的性能
 
-没有 GPU,SwiftShader 软件渲染。几条经验(和 `projects/happy-birthday/tools/README-perf.md`
+没有 GPU,SwiftShader 软件渲染。几条经验(和 `README-perf.md`
 一致,另加两条):
 
 - `canvas.toBlob()` 前先 `getImageData(0,0,1,1)` 把光栅化提前做完;**2D 画布要
