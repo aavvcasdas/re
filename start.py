@@ -6,7 +6,7 @@
 
 用法 / Usage:
 
-    python start.py                       # 渲染 projects/happy-birthday
+    python start.py                       # 渲染 projects/huiyi
     python start.py --project chaoxi-tide # 渲染指定项目(名字或路径)
     python start.py --list                # 列出仓库里的影片
     python start.py --check               # 只体检环境,什么都不渲染
@@ -123,7 +123,7 @@ def list_projects():
 
 def resolve_project(name):
     if name is None:
-        return ROOT / "projects" / "happy-birthday"
+        return ROOT / "projects" / "huiyi"
     p = Path(name).expanduser()
     if (p / "package.json").exists(): return p.resolve()
     p = ROOT / "projects" / name
@@ -231,7 +231,7 @@ def ensure_ffmpeg(npm):
 # ---------------------------------------------------------------- render
 def main():
     ap = argparse.ArgumentParser(add_help=True, description="渲染这个仓库里的手绘影片(自动装依赖)")
-    ap.add_argument("--project", "-p", help="projects/ 下的项目名或路径(默认 happy-birthday)")
+    ap.add_argument("--project", "-p", help="projects/ 下的项目名或路径(默认 huiyi)")
     ap.add_argument("--audio", "-a", help="要合进成片的音频文件")
     ap.add_argument("--workers", "-w", type=int, default=max(1, (os.cpu_count() or 2) // 2), help="并行渲染的浏览器数(默认 CPU 核数的一半)")
     ap.add_argument("--sheet", help="只渲染几个时间点的缩略图,例如 1,6,12")
