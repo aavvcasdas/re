@@ -1,8 +1,4 @@
-// config.js: project settings.
-//   duration: 31.84 s — the uploaded 潮汐.MP3, used byte-for-byte as assets/song.mp3 (unmodified).
-//   bpm:      118. Kick-comb + lyric-line fit on the clip itself: 118 BPM, 4/4, beat 0.5085 s.
-//             Every lyric phrase starts on a beat (two on the half-beat), so cuts ride the same grid.
-//   offset:   first downbeat at 0.456 s (the vocal opens with a one-beat pickup before it).
-//   flat:     drop the watercolour fills (see FLAT in core.js) — software-GL rendering budget.
-//   audio:    the song; --encode muxes it in unmodified.
-const PROJECT = { duration: 31.84, bpm: 118, offset: 0.456, flat: true, audio: 'assets/song.mp3' };
+// 《潮汐·留灯》 — source audio is the AAC track in the user-supplied 潮汐.mp4, extracted to MP3.
+// The onset grid measures ~70.3 BPM, beat 0.8535 s, first strong beat 0.430 s.
+// Frame time, captions and principal cuts are all pure functions of t; render on twos at 12 fps.
+const PROJECT = { duration: 55.983, bpm: 70.3, offset: 0.430, flat: true, audio: 'assets/song.mp3' };

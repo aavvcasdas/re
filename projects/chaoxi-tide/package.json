@@ -1,12 +1,12 @@
 {
-  "name": "claude-animation-base",
+  "name": "chaoxi-liudeng",
   "version": "1.0.0",
   "private": true,
   "license": "MIT",
-  "description": "Clawd, painted in p5.brush: a character kit and guide for making hand-painted Clawd animations",
+  "description": "Original salt-print / paper-cut lyric film set to the user-supplied Tide audio.",
   "scripts": {
-    "sheet": "node render.mjs --sheet=0,1,2,3,4,5 --out=out/sheet.jpg",
-    "video": "node render.mjs --clip --out=out/video.mp4"
+    "sheet": "node render.mjs --sheet=2.2,6.4,10.1,14.5,18.5,22.3,26,30.5,34.2,38.1,42.3,47,50.7,54.6 --cols=4 --w=320 --soft-gl --fps=12 --out=docs/shot-sheet.jpg",
+    "video": "node render.mjs --clip --fps=12 --out=out/video.mp4"
   },
   "dependencies": {
     "@fontsource/ma-shan-zheng": "^5.3.1",

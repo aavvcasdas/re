@@ -1,37 +1,38 @@
-# 《潮汐(Natural)》— 32 秒手绘 Clawd 歌词 MV
+# 《潮汐·留灯》— 56 秒剪纸盐版歌词 MV
 
-用 **椰子水很甜同款管线**(p5.js + p5.brush 平涂水粉 + 水墨线 + 纸纹,无头 Chromium 逐帧渲染)
-把上传的 `潮汐.MP3`(31.84 s,**原样使用不改**)做成一部 **Clawd** 主角的歌词 MV:
-11 行唱词逐字金色填充(卡拉 OK),14 个镜头全部切在拍子上。
+以新上传的 [`潮汐.mp4`](../../潮汐.mp4) 为音乐与节奏参考，抽取内嵌 AAC 音轨转成 MP3，再用本仓库的 p5.js + p5.brush 渲染器重做一支原创 2D 歌词 MV。画面改为**盐蚀版画 × 折纸潮汐图**：梨形潮种与折纸海燕穿过潮线、浅滩和盐珊瑚；不复用参考片的球形小世界、方盒角色、具体镜头或黑底字幕牌。
 
 | | |
 |---|---|
-| 歌 | 《潮汐(Natural)》— 安苏羽 / 傅梦彤,词 安苏羽 / 舒心 |
-| 音频 | 上传的 `潮汐.MP3`,byte-for-byte 作为 `assets/song.mp3` 打进成片 |
-| 唱词 | 用户给的 11 行(内部 13 个唱段时间,见 [assets/song.lrc](assets/song.lrc)) |
-| 网格 | **118 BPM / 4/4,第一正拍 0.456 s**(底鼓 comb + 唱句拟合);唱句全落拍上,**切点=拍点** |
-| 规模 | 14 镜 / 4 章,12 fps(手绘「拍二」),382 帧,31.8 s |
-| 分镜 | [STORYBOARD.md](STORYBOARD.md) |
+| 时长 | 55.983 秒（源视频 56 秒） |
+| 声音 | `assets/song.mp3`：从 MP4 的 HE-AACv2 音轨抽取并转码为 MP3；根目录另存 `潮汐_提取.mp3` |
+| 节拍 | 约 70.3 BPM，0.8535 秒 / 拍；首个强拍 0.430 秒 |
+| 唱词 | 13 条，按从视频读取的唱词与节拍点写入 [`assets/song.lrc`](assets/song.lrc) |
+| 画面 | 14 镜；12 fps（手绘 on twos）；双色套印、偏移描边、等高线、纸纹 |
+| 分镜 | [`STORYBOARD.md`](STORYBOARD.md)；参考拆解见 [`REFERENCE_ANALYSIS.md`](REFERENCE_ANALYSIS.md) |
+| 成片 | [`out/video.mp4`](out/video.mp4)（随仓库提交，56 秒 / 14 镜 / 12 fps） |
 
-![poster](docs/poster.jpg)
+![《潮汐·留灯》海报](docs/poster.jpg)
 
-## 复现
+[查看 14 镜 contact sheet](docs/shot-sheet.jpg) · [参考视频拆解](REFERENCE_ANALYSIS.md) · [完整读点 / 分镜](STORYBOARD.md)
+
+## 重渲染
+
+环境需要 Node.js、Chrome / Chromium 与 ffmpeg。依赖装好后：
 
 ```bash
-source /tmp/env.sh   # 或自行准备 Chrome + ffmpeg(CHROME_PATH 指向 Chrome)
 npm install
-node render.mjs --sheet=5,13,20,27 --cols=4 --soft-gl --out=out/check/a.jpg   # 先看几帧
-node render.mjs --frames --workers=2 --soft-gl --fps=12                       # 逐帧(~6 min,可续渲)
-node render.mjs --encode --out=out/video.mp4 --audio=assets/song.mp3 --fps=12 # 编码
+node render.mjs --sheet=2.5,6.4,10.0,14.4,18.5,22.4 --cols=3 --w=480 --soft-gl --fps=12 --out=out/check/keyframes.jpg
+node render.mjs --frames --workers=2 --soft-gl --fps=12
+node render.mjs --encode --out=out/video.mp4 --audio=assets/song.mp3 --fps=12
 ```
 
-注意:render.mjs 的 `--frames` 是**断点续渲**的(已有帧直接跳过)——改了场景代码要重渲,
-先删 `out/frames/` 再跑。
+`--frames` 可续渲；若修改场景代码，先清理 `out/frames/` 再重渲，避免旧帧混入。也可直接运行 `node render.mjs --clip --fps=12 --out=out/video.mp4`，它会从 `src/config.js` 读取默认音轨。
 
-## 卡点与唱词
+## 参考项目如何用在这支片里
 
-- 节拍是量出来的:底鼓包络 comb → 118 BPM、相位 0.456;13 个唱句起点与拍网格吻合在 ±0.1 s 内
-  (其中两句在半拍上)。所有镜头切点 = 唱句起点所在拍。
-- 唱词显示按用户给的 11 行排版;「蓝色的海底 远山的风景」这类两口气的行,金色填充按两个子句
-  各自的起唱时间推进;上一句 hold 时缩小抬升,像 KTV 双行。
-- 时间轴里 `src/karaoke.js` 的 `LY` 表就是逐字填充的真相来源;`assets/song.lrc` 留档同一批时间。
+- [ClaudeAnimationBase](https://github.com/JohnHeibel/ClaudeAnimationBase)：保持逐帧纯函数、动作有预备和回弹、逐镜做接触表检查。
+- [Lemo-Opuscar](https://github.com/lemomo-ai/lemo-opuscar)：先定美术媒介、情绪弧线、镜头节奏与每镜读点，再进入绘制。
+- [ReelMimic](https://github.com/edenfunf/reelmimic)：先拆时长、构图、调色和字幕，再只借鉴剪辑方法，不搬用参考片资产。
+
+完整参考拆解、选择性保留与主动避开的视觉元素写在 [`REFERENCE_ANALYSIS.md`](REFERENCE_ANALYSIS.md)。歌词与音乐来自用户上传素材；相关使用权仍归原权利人。

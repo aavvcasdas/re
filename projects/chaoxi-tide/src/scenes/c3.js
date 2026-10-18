@@ -1,91 +1,69 @@
-// c3.js — 距离(18.76–26.64 s,S9–S11)
-// 我们的距离 遥不可及 / 退守的爱情 / 还剩下回忆
+// c3.js — 32.86–44.81s | undertow → a salt bloom → the trace it leaves
 (() => {
-  const HERO_U = 26, DEAR_U = 24;
-  const T9 = beatNo(36.5), T10 = beatNo(44), T11 = beatNo(48);   // 19.02 22.83 24.86
+  const s9 = (t, lt, D) => {
+    camBegin(W * .50, H * .48, lerp(1.00, 1.13, ease(seg(lt, .15, D))), .025 * Math.sin(lt * .7));
+    fillFrame(F.deep);
+    cutPoly([[-30, 360], [140, 306], [310, 339], [500, 296], [660, 335], [850, 300], [W + 30, 350], [W + 30, H + 30], [-30, H + 30]], F.deep2, 255, null);
+    waterSheet(385, 205, t, F.sea, 9, 1.2, null);
+    spiralLines(492, 337, t, 2.35, 310, F.seaLite);
+    const q = ease(seg(lt, .35, D - .25));
+    const a = -.82 + q * TAU * .72, radius = lerp(190, 65, q);
+    const hx = 492 + Math.cos(a) * radius, hy = 337 + Math.sin(a) * radius * .70 + 65;
+    seedSprite(hx, hy, HERO_U * .73, t, { face: 'overwhelmed', step: true, tilt: .10 * Math.sin(lt * 2), key: 'undertow-seed', heart: .25 });
+    // The companion stays on the bank and reaches across the current; it cannot pull the memory out of the spiral.
+    raySprite(784, 418, RAY_U * .72, t, { face: 'sad', tilt: -.06, key: 'undertow-ray' });
+    ln([[734, 388], [688, 361], [654, 379], [621, 363]], 1.25, F.gold, 'inkfine', .68);
+    for (let i = 0; i < 5; i++) dotAt(690 - i * 15, 374 + Math.sin(t + i) * 4, 2.2, F.goldLite, 160);
+    camEnd();
+    transition(lt, D, 8);
+  };
 
-  // ---- 第 10 镜(19.02–22.83):遥不可及(全片最长的一口气) ----
-  // reads: ① 两座崖隔着海(0–1.2) ② 左边 Clawd、右边小小的蓝色身影(0.8–2.2) ③ 镜头缓缓拉远,距离越来越远(1.2–3.81)
   const s10 = (t, lt, D) => {
-    camBegin(W * .5, H * .5, lerp(1.12, .86, ease(seg(lt, .3, D))), 0);
-    boilSeed('s10sky');
-    band(-40, H * .38, mixCol('#C8D2E0', '#8E86A8', .35), 255);
-    band(H * .22, H * .5, mixCol('#D8C8C0', '#A08E9E', .45), 255);
-    // 海(夹在两崖之间)
-    boilSeed('s10sea');
-    band(H * .5, H * .8, mixCol(F.seaLt, F.sea, .5), 255);
-    band(H * .62, H + 40, mixCol(F.sea, F.seaDk, .4), 255);
+    camBegin(W * .50, H * .49, lerp(1.08, .94, ease(seg(lt, 0, D))), 0);
+    fillFrame(F.paper);
+    // Macro tide-pool plate: salt-coral blooms outward like a pressed print, not a sky full of fireworks.
+    paint(ellPts(490, 297, 390, 275, 40, 2), { wash: F.paperHi, ink: F.seaLite, sw: .7 });
+    contourSet(490, 297, 350, 235, 4, F.seaLite, t, .68, 2.8);
+    const age = lt + .10 * Math.sin(t * .7);
+    bloomAt(490, 286, age, 205, F.coral);
     for (let i = 0; i < 7; i++) {
-      const y = H * (.55 + i * .06), x = frac(hash(i * 3.3) + t * .025) * (W + 200) - 100;
-      paint(ellPts(x, y, W * (.1 + hash(i * 4.4) * .16), 2.2 + i * .35, 12, .6), { wash: mixCol(F.seaLt, F.cream2, .35), washOp: 110, ink: null });
+      const a = i / 7 * TAU - Math.PI / 2, r = 210 + 18 * Math.sin(t + i);
+      const x = 490 + Math.cos(a) * r, y = 286 + Math.sin(a) * r * .72;
+      dotAt(x, y, 3 + (i % 3), i % 2 ? F.gold : F.sea, 175);
     }
-    // 左右两座崖
-    cliffAt(-W * .06, W * .42, H * .55, mixCol('#5E5470', '#3E3450', .2), 1);
-    cliffAt(W * .66, W * .40, H * .58, mixCol('#5E5470', '#3E3450', .35), 1);
-    // 左崖 Clawd 望着右边
-    hero(W * .16, H * .52, HERO_U * .9, {
-      ...emotions(t, [[T9, 'moved', { lookX: .9 }], [T9 + 2.2, 'sad', { lookX: .85, lookY: .2 }]]),
-      view: 'q', aL: .1, aR: .55, boilKey: 'h10', noShadow: true,
-    });
-    // 右崖:小小的蓝色身影(远、看不清)
-    const twinkle = .75 + Math.sin(t * 2.2) * .25;
-    dear(W * .82, H * .555, DEAR_U * .52, { ...feel('moved', t), view: 'q', flip: true, aL: .3, aR: .3, boilKey: 'd10', noShadow: true });
-    dotAt(W * .845, H * .50, 1.6, F.cream2, 160 * twinkle);
-    // 海鸟一横排
-    for (let i = 0; i < 4; i++) gullAt(W * (.32 + i * .1) + Math.sin(t * .5 + i * 2) * 12, H * (.24 + hash(i * 2) * .08), 9, t * 2.4 + i);
-    // 空气里的一点点雾
-    boilSeed('s10mist');
-    for (let i = 0; i < 6; i++) dotAt(W * (.3 + hash(i * 3.1) * .45), H * (.52 + hash(i * 5.5) * .16), 30 + hash(i) * 26, F.cream2, 22);
+    // A small dark impression survives after the colour has gone.
+    const trace = ease(seg(lt, 1.8, 3.2));
+    paint(ellPts(490, 286, 36 + trace * 9, 25 + trace * 5, 20, 1), { wash: F.rustDk, washOp: 125 * trace, ink: null });
+    registrationMark(118, 92, 8, F.sea);
+    registrationMark(W - 120, H - 96, 8, F.coral);
     camEnd();
+    transition(lt, D, 9);
   };
 
-  // ---- 第 11 镜(22.83–24.86):退守的爱情 ----
-  // reads: ① 湿沙上一颗心形水洼(0–0.8) ② 退潮,水洼被浪抹开(0.8–1.7) ③ 只剩一片湿痕(1.7–2.03)
   const s11 = (t, lt, D) => {
-    camBegin(W * .5, H * .58, lerp(1.14, 1.06, ease(seg(lt, .2, D))), 0);
-    shoreAt(t, { hy: H * .30, dusk: .55 });
-    // 心形水洼
-    const fade = ease(seg(lt, .75, 1.75));
-    heartPoolAt(W * .5, H * .72, 78, 1 - fade * .35);
-    // 退潮:水线往画面下方退,心被拉长、抹散
-    boilSeed('s11tide');
-    const ry = lerp(H * .78, H * .95, ease(seg(lt, 0, 2.03)));
-    ln([[-20, ry], [W * .5, ry + Math.sin(t * 2.2) * 4], [W + 20, ry - 3]], 2.6, mixCol(F.seaLt, F.cream2, .5), 'inkfine', 1);
-    // 抹散的水痕
-    if (fade > 0) {
-      for (let i = 0; i < 5; i++) {
-        const y = H * .72 + (i - 2) * 11, w = 30 + fade * (60 + hash(i * 3) * 60);
-        paint(ellPts(W * .5 + (hash(i * 2.2) - .5) * 30, y, w, 3.4, 12, .5), { wash: mixCol(F.seaLt, F.cream2, .45), washOp: 150 * fade, ink: null });
-      }
+    camBegin(W * .50, H * .52, 1.0, 0);
+    fillFrame(F.deep2);
+    waterSheet(365, 205, t, F.sea, 8, 1.1, null);
+    // A torn vellum sheet holds the flower for one beat; the incoming tide washes away its ink, not the memory.
+    const vellum = [[112, 118], [232, 101], [344, 119], [467, 95], [579, 112], [702, 98], [823, 119],
+      [840, 204], [821, 278], [845, 365], [718, 355], [598, 379], [470, 357], [348, 380], [223, 359], [125, 376], [114, 278]];
+    cutPoly(vellum, F.paperHi, 255, null);
+    ln([[112, 118], [232, 101], [344, 119], [467, 95], [579, 112], [702, 98], [823, 119]], .75, F.seaLite, 'inkfine', .25);
+    ln([[125, 376], [223, 359], [348, 380], [470, 357]], .55, F.shellDk, 'inkfine', .25);
+    contourSet(493, 265, 246, 170, 4, F.seaLite, t, .64, .9);
+    bloomAt(490, 266, .96, 150, F.rust);
+    const erase = ease(seg(lt, 1.15, 3.65));
+    waterSheet(306 + erase * 90, 90, t, mixCol(F.paperHi, F.seaLite, .60), 7, 1.7, null);
+    // Pigment pulls down in narrow threads, leaving a rough white negative-space flower.
+    for (let i = 0; i < 7; i++) {
+      const x = 420 + i * 22, y0 = 304 + (i % 3) * 7, len = erase * (26 + (i % 4) * 13);
+      ln([[x, y0], [x - 3 + Math.sin(t + i) * 2, y0 + len], [x + 2, y0 + len + 8]], .8, i % 2 ? F.rustDk : F.coral, 'inkfine', .45);
     }
-    // 一点退潮留下的亮沙
-    paint(ellPts(W * .5, H * .735, W * .16 * (1 + fade * .5), H * .02, 18, 3), { wash: mixCol(F.sand, F.cream2, .4), washOp: 100 + fade * 40, ink: null });
+    seedSprite(345, 458, HERO_U * .47, t, { face: 'sad', key: 'imprint-seed', heart: .18 });
+    raySprite(630, 448, RAY_U * .43, t, { face: 'quiet', key: 'imprint-ray', fade: .1 });
     camEnd();
+    transition(lt, D, 10);
   };
 
-  // ---- 第 12 镜(24.86–26.64):还剩下回忆 ----
-  // reads: ① 沙上一朵纸花(0–0.6) ② 搁浅的漂流瓶在旁边(0.3–1.2) ③ 远处小小的背影离开(全镜)
-  const s12 = (t, lt, D) => {
-    camBegin(W * .5, H * .56, lerp(1.08, 1.14, ease(seg(lt, .3, D))), 0);
-    shoreAt(t, { hy: H * .32, dusk: .85 });
-    // 纸花(大一点、微微开合)插在湿沙上
-    paperFlowerAt(W * .40, H * .72, 46, F.cream2, F.rose, .85 + Math.sin(t * .9) * .1);
-    ln([[W * .40, H * .74], [W * .41, H * .80]], 2, '#7A9A6A', 'ink', .4);
-    // 搁浅的瓶子,横躺着
-    push(); translate(W * .62, H * .74); rotate(1.35 + Math.sin(t * .5) * .02);
-    bottleAt(0, 0, 20, 0, 1);
-    pop();
-    // 花旁边的湿沙反光
-    paint(ellPts(W * .5, H * .78, W * .14, H * .02, 16, 3), { wash: mixCol(F.fwGold, F.sand, .4), washOp: 130, ink: null });
-    // 远处小小的背影正离开(「回忆」的主体走了,物还在)
-    hero(W * .86, H * .52, HERO_U * .42, { ...feel('moved', t), view: 'back', aL: -.1, aR: -.1, boilKey: 'h12', noShadow: true });
-    // 一只小蟹横着爬过(彩蛋)
-    boilSeed('s12crab');
-    const cx = W * .16 + frac(t * .06) * W * .2, cy = H * .82;
-    dotAt(cx, cy, 6, F.clay, 255); dotAt(cx - 8, cy + 2, 2.6, F.clay); dotAt(cx + 8, cy + 2, 2.6, F.clay);
-    ln([[cx - 6, cy - 5], [cx - 11, cy - 9]], 1, F.clayDk); ln([[cx + 6, cy - 5], [cx + 11, cy - 9]], 1, F.clayDk);
-    camEnd();
-  };
-
-  shots([[T9, s10], [T10, s11], [T11, s12]]);
+  shots([[CUTS[8], s9], [CUTS[9], s10], [CUTS[10], s11]]);
 })();

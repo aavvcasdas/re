@@ -1,81 +1,60 @@
-// karaoke.js — 唱词卡拉 OK,逐字金色填充。挂在 window.overlayHook 上(core.js 的 2D 合成层)。
-//
-// 用户给的 11 行显示行;内部 13 个唱段时间(assets/song.lrc,贴着 118 BPM 的网格)。
-// 显示行 = 若干 segs 拼起来:segs = [[t0, t1, '子句'], …],金色按子句各自推进,
-// 所以「蓝色的海底 远山的风景」这种两口气的长行,填充会跟着换气走。
+// karaoke.js — one-line lyrics, letter-pressed onto a light paper strip.
+// The active characters are overprinted in rust; there is no dark source-style subtitle banner.
+// Timings follow the measured ~70.3 BPM grid (0.8535 s/beat), transcribed from the supplied video.
 const LY = [
-  { segs: [[0.04, 1.98, '当海面迎来汹涌的潮汐']] },
-  { segs: [[1.98, 4.02, '我奔跑寻找昔日的足迹']] },
-  { segs: [[4.02, 6.05, '夕阳下倒影迷人的美丽']] },
-  { segs: [[6.05, 8.08, '可我却丢失故事和你']] },
-  { segs: [[8.08, 10.12, '你说过向往大海的神秘']] },
-  { segs: [[10.12, 12.15, '也憧憬我们遗失的过去']] },
-  { segs: [[12.15, 14.69, '分享给大海秘密']] },
-  { segs: [[14.69, 16.73, '蓝色的海底'], [16.73, 19.02, '远山的风景']] },
-  { segs: [[19.02, 22.83, '我们的距离 遥不可及']] },
-  { segs: [[22.83, 24.86, '退守的爱情'], [24.86, 26.64, '还剩下回忆']] },
-  { segs: [[26.64, 29.20, '疯狂的寻觅 你的身影']], hold: 2.3 },  // 末句唱完挂到片尾
+  { start: 0.430, end: 4.697, text: '我们都是渺小真实存在' },
+  { start: 4.697, end: 8.111, text: '祈愿小世界里不只有挫败' },
+  { start: 8.111, end: 12.379, text: '直到遇见你我以为就光明起来' },
+  { start: 12.379, end: 16.646, text: '眼睛里看到的都是广袤无垠的大海' },
+  { start: 16.646, end: 20.914, text: '你对我说的情话' },
+  { start: 20.914, end: 24.328, text: '在最灰暗的日子你陪着我发呆' },
+  { start: 24.328, end: 28.596, text: '有你在的日子里不可能被取代' },
+  { start: 28.596, end: 32.863, text: '将快乐全部收集' },
+  { start: 32.863, end: 37.131, text: '我却已无法自拔' },
+  { start: 37.131, end: 40.545, text: '像转瞬即逝的烟花' },
+  { start: 40.545, end: 44.812, text: '只停在绽放一刹那' },
+  { start: 44.812, end: 49.079, text: '也为你骗自己放下' },
+  { start: 49.079, end: 52.900, text: '爱炙热的你却忘了爱自己' },
 ];
-// 预计算:显示文本 + 每个字的填充时段(fill 时钟映射到子句上)
-for (const L of LY) {
-  L.text = L.segs.map(s => s[2]).join(' ');
-  L.start = L.segs[0][0];
-  L.end = L.segs[L.segs.length - 1][1];
-  L.chars = [];  // [{ch, t0, t1}] — 空格也占位,但不计填充宽度以外的东西
-  for (const [a, b, txt] of L.segs) {
-    const cs = [...txt], n = cs.length, dur = (b - a) * .92;
-    cs.forEach((ch, i) => L.chars.push({ ch, t0: a + dur * i / n, t1: a + dur * (i + 1) / n }));
-  }
-}
 const KFONT = '"Ma Shan Zheng", "Kaiti SC", "STKaiti", serif';
 window.EXTRA_FONTS = [[`30px ${KFONT}`, LY.map(l => l.text).join('')]];
-const KY = 512, KF = 30;   // 960×540 画布:字 30px,条子 y=512
-
+const KY = 503, KF = 29;
 window.overlayHook = (c, t) => {
-  // 当前行永远优先;hold 的上一行缩小抬到上一行的位置,像 KTV 双行
-  const cur = LY.find(L => t >= L.start && t < L.end);
-  const prev = LY.find(L => t >= L.end && t < L.end + (L.hold ?? .45));
-  if (prev) {
-    const a = t - prev.end, k = ease(clamp(a / .15));
-    kLine(c, prev, t, KY - 54 * k, 1 - .28 * k, 1 - ease(clamp((a - ((prev.hold ?? .45) - .35)) / .35)), true);
-  }
-  if (cur) kLine(c, cur, t, KY, 1, 1, false);
-};
-function kLine(c, L, t, y, sc, alpha, held) {
+  const L = LY.find(x => t >= x.start && t < x.end);
+  if (!L) return;
+  const fadeIn = ease(clamp((t - L.start) / .12));
+  const fadeOut = 1 - ease(clamp((t - (L.end - .12)) / .12));
+  const alpha = fadeIn * fadeOut;
   if (alpha <= .01) return;
-  const txt = L.text;
-  const grow = held ? 1 : easeOut((t - L.start) / .18);
-  if (grow < .02) return;
-  c.save(); c.globalAlpha = alpha; c.translate(480, y); c.scale(sc, sc); c.translate(-480, -y);
-  c.font = `${KF}px ${KFONT}`; c.textBaseline = 'middle'; c.textAlign = 'left';
-  const total = c.measureText(txt).width;
-  // 条子:边缘毛糙的墨色椭圆,从中心长出来,和线条一起 boil
-  const w = (total + 60) * grow, x0 = 480 - w / 2, y0 = y - 24, r = n => hash(BOILN * 13 + n) * 4 - 2;
-  c.globalAlpha = .86 * alpha; c.fillStyle = PAL.ink; c.beginPath();
-  c.moveTo(x0 + r(1), y0 + r(2)); c.lineTo(x0 + w / 2, y0 - 3 + r(3)); c.lineTo(x0 + w + r(4), y0 + r(5));
-  c.lineTo(x0 + w + 8, y0 + 23); c.lineTo(x0 + w + r(6), y0 + 46 + r(7)); c.lineTo(x0 + w / 2, y0 + 48 + r(8));
-  c.lineTo(x0 + r(9), y0 + 46 + r(10)); c.lineTo(x0 - 8, y0 + 23); c.closePath(); c.fill();
-  c.globalAlpha = alpha;
-  if (grow > .85) {
-    // 逐字填充:按 L.chars 的时段推进(两口气的行会跟着换气停一下)
-    const x = 480 - total / 2;
-    c.fillStyle = PAL.cream; c.fillText(txt, x, y);
-    let cx = x;
-    for (const ch of L.chars) {
-      const cw = c.measureText(ch.ch).width;
-      if (t >= ch.t1) { c.fillStyle = PAL.ochre; c.fillText(ch.ch, cx, y); }
-      cx += cw;
+  c.save(); c.globalAlpha = alpha;
+  c.font = `${KF}px ${KFONT}`; c.textAlign = 'left'; c.textBaseline = 'middle';
+  const widths = [...L.text].map(ch => c.measureText(ch).width);
+  const total = widths.reduce((a, b) => a + b, 0), scale = Math.min(1, 824 / Math.max(1, total));
+  const fontPx = KF * scale; c.font = `${fontPx}px ${KFONT}`;
+  const rowWidth = widths.reduce((a, b) => a + b * scale, 0), x = 480 - rowWidth / 2, y = KY;
+  const padX = 22, padY = 9, left = x - padX, right = x + rowWidth + padX;
+  // Ragged, pale letterpress stock: a different silhouette and value structure from the reference's dark plaque.
+  c.beginPath();
+  c.moveTo(left + 4, y - 18 - padY); c.lineTo(left + (right - left) * .34, y - 20 - padY);
+  c.lineTo(left + (right - left) * .69, y - 17 - padY); c.lineTo(right - 4, y - 19 - padY);
+  c.lineTo(right + 2, y - 3); c.lineTo(right - 1, y + 15 + padY); c.lineTo(left + (right - left) * .61, y + 17 + padY);
+  c.lineTo(left + (right - left) * .30, y + 15 + padY); c.lineTo(left - 2, y + 18 + padY); c.lineTo(left - 5, y + 2); c.closePath();
+  c.fillStyle = 'rgba(243, 233, 212, 0.94)'; c.fill();
+  c.lineWidth = 1; c.strokeStyle = 'rgba(39, 75, 90, 0.72)'; c.stroke();
+  c.beginPath(); c.moveTo(left + 15, y - 16); c.lineTo(right - 15, y - 16);
+  c.strokeStyle = 'rgba(217, 166, 79, 0.55)'; c.lineWidth = 1; c.stroke();
+  c.fillStyle = '#183244'; c.fillText(L.text, x, y);
+  // A single character-by-character overprint follows the vocal phrase.
+  const progress = clamp((t - L.start) / (L.end - L.start));
+  const chars = [...L.text], lit = progress * chars.length;
+  let cx = x;
+  for (let i = 0; i < chars.length; i++) {
+    const cw = widths[i] * scale, amount = clamp(lit - i);
+    if (amount > 0) {
+      c.save(); c.beginPath(); c.rect(cx - 1, y - 19, cw * amount + 2, 38); c.clip();
+      c.fillStyle = '#B94F46'; c.fillText(chars[i], cx, y); c.restore();
     }
-    // 中间态:当前字按进度裁一半(用裁剪画,保证笔画完整)
-    const cur = L.chars.find(ch => t >= ch.t0 && t < ch.t1);
-    if (cur && !held) {
-      const i = L.chars.indexOf(cur);
-      const xw = x + L.chars.slice(0, i).reduce((s, ch) => s + c.measureText(ch.ch).width, 0);
-      const cw = c.measureText(cur.ch).width, f = clamp((t - cur.t0) / (cur.t1 - cur.t0));
-      c.save(); c.beginPath(); c.rect(xw - 1, y - 25, cw * f + 2, 50); c.clip();
-      c.fillStyle = PAL.ochre; c.fillText(cur.ch, xw, y); c.restore();
-    }
-    if (held) { c.fillStyle = PAL.ochre; c.fillText(txt, x, y); }
+    cx += cw;
   }
   c.restore();
-}
+};

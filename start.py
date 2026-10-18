@@ -234,6 +234,7 @@ def main():
     ap.add_argument("--project", "-p", help="projects/ 下的项目名或路径(默认 huiyi)")
     ap.add_argument("--audio", "-a", help="要合进成片的音频文件")
     ap.add_argument("--workers", "-w", type=int, default=max(1, (os.cpu_count() or 2) // 2), help="并行渲染的浏览器数(默认 CPU 核数的一半)")
+    ap.add_argument("--fps", type=int, default=24, help="输出帧率(默认 24;歌词 MV 可用 12 帧 on twos)")
     ap.add_argument("--sheet", help="只渲染几个时间点的缩略图,例如 1,6,12")
     ap.add_argument("--range", dest="range_", help="只渲染一段时间,例如 6:12(秒)")
     ap.add_argument("--soft-gl", action="store_true", help="强制软件渲染(没有 GPU 的机器/服务器)")
@@ -300,14 +301,14 @@ def main():
     if args.sheet:
         sheet = args.sheet
         say(f"缩略图 {sheet} → {project}/out/check/sheet.jpg")
-        rc = render([f"--sheet={sheet}", "--cols=3", "--w=560", "--out=out/check/sheet.jpg", *soft, f"--workers={args.workers}"], "渲染缩略图")
+        rc = render([f"--sheet={sheet}", "--cols=3", "--w=560", f"--fps={args.fps}", "--out=out/check/sheet.jpg", *soft, f"--workers={args.workers}"], "渲染缩略图")
         sys.exit(rc)
 
-    frames = ["--frames", f"--workers={args.workers}", *soft]
+    frames = ["--frames", f"--workers={args.workers}", f"--fps={args.fps}", *soft]
     if args.range_: frames.append(f"--range={args.range_}")
     if render(frames, f"逐帧渲染({args.workers} 个浏览器并行,可随时 Ctrl-C,再跑会接着上次继续)"): die("渲染中断")
     out = args.out or "out/video.mp4"
-    enc = ["--encode", f"--out={out}", *soft]
+    enc = ["--encode", f"--out={out}", f"--fps={args.fps}", *soft]
     if args.audio:
         a = Path(args.audio).expanduser()
         if not a.exists(): die(f"找不到音频 {a}")

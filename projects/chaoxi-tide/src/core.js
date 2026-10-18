@@ -4,9 +4,9 @@ const W = 960, H = 540;
 const BPM = PROJECT.bpm, BEAT = 60 / BPM, OFF = PROJECT.offset || 0, BOIL = 12, DUR = PROJECT.duration;
 const TAU = Math.PI * 2;
 const PAL = {
-  paper: '#F3EBDC', ink: '#2B2233', clay: '#D97757', clayDk: '#A84D33', clayLt: '#F2A283',
-  night: '#1F2550', indigo: '#2F3C7A', rose: '#E27A92', ochre: '#E8AA38', sap: '#6E9F58',
-  teal: '#3A9C98', violet: '#7B5CA8', cream: '#FFF5E2', sky: '#8EC3E6'
+  paper: '#E9DFC7', ink: '#183244', clay: '#C75B4D', clayDk: '#883D43', clayLt: '#F0B17D',
+  night: '#102B3B', indigo: '#1B4051', rose: '#DF8164', ochre: '#D9A64F', sap: '#687D65',
+  teal: '#286F7A', violet: '#5C5368', cream: '#F3E9D4', sky: '#9AB9A7'
 };
 
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
