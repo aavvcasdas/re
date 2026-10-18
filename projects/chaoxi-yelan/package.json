@@ -1,0 +1,19 @@
+{
+  "name": "chaoxi-yelan",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "潮汐·夜蓝: the 56 s full-length night-pastel cut — Clawd, painted in p5.brush on dark paper",
+  "scripts": {
+    "sheet": "node render.mjs --sheet=0,1,2,3,4,5 --out=out/sheet.jpg",
+    "video": "node render.mjs --clip --out=out/video.mp4"
+  },
+  "dependencies": {
+    "@fontsource/ma-shan-zheng": "^5.3.1",
+    "@fontsource/permanent-marker": "^5.3.0",
+    "@fontsource/shantell-sans": "^5.3.0",
+    "p5": "^2.3.3",
+    "p5.brush": "^2.2.3",
+    "puppeteer-core": "^25.11.0"
+  }
+}

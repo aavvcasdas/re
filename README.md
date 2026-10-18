@@ -8,9 +8,15 @@
 |---|---|---|---|
 | **把回忆拼好给你** | 椰子水很甜《把回忆拼好给你(纯享Beat)》,95 BPM,4/4 | 2:22,28 个镜头 | [`projects/huiyi/out/video.mp4`](projects/huiyi/out/video.mp4),38 MB |
 | **潮汐** | 《潮汐(Natural)》— 安苏羽 / 傅梦彤,118 BPM,4/4 | 0:32,14 个镜头 | [`projects/chaoxi-tide/out/video.mp4`](projects/chaoxi-tide/out/video.mp4),7 MB |
+| **潮汐 · 夜蓝** | 同一首歌的完整 56 s 音轨(从 `潮汐.mp4` 抽出),118 BPM | 0:56,20 个镜头 | [`projects/chaoxi-yelan/out/video.mp4`](projects/chaoxi-yelan/out/video.mp4) |
 
-片的主角都是 **Clawd** —— 引擎自带角色库里的方盒子(`src/clawd.js`)。两部片都带
-**卡拉 OK 唱词**(逐字金色填充,`src/karaoke.js`),切镜与动作全部卡在小节线上。
+三部片的主角都是 **Clawd** —— 引擎自带角色库里的方盒子(`src/clawd.js`)。前两部带
+**卡拉 OK 唱词**(逐字填充,`src/karaoke.js`),切镜与动作全部卡在小节线上;《夜蓝》同一套网格,
+但纸换成深蓝夜纸、光全部用 glow 画、每个镜头都有运镜 —— 参照的三个上游项目见
+[它的 README](projects/chaoxi-yelan/README.md#潮汐--夜蓝56-秒夜色粉彩歌词-mv)。
+
+节拍不是听出来的:`tools/beat_grid.py` 一次量好 BPM / 相位 / 唱句 / 能量(参照 lemo-opuscar 的
+audiomap 做法),输出 `audiomap.json`,场景、卡拉 OK、切点都只读这一张表。
 
 ![把回忆拼好给你](projects/huiyi/docs/poster.jpg)
 ![潮汐](projects/chaoxi-tide/docs/poster.jpg)
@@ -46,11 +52,13 @@ py —— 任何装了 Python 3 的机器都能直接跑。
 ```
 start.py                            本地渲染包(见上)
 projects/huiyi/                     《把回忆拼好给你》:28 镜头歌词 MV,卡拉 OK 唱词
-projects/chaoxi-tide/               《潮汐(Natural)》:32 秒歌词 MV,14 镜头
+projects/chaoxi-tide/               《潮汐(Natural)》:32 秒歌词 MV,14 镜头(日间水粉)
+projects/chaoxi-yelan/              《潮汐·夜蓝》:56 秒歌词 MV,20 镜头(夜色粉彩,完整音轨)
+tools/beat_grid.py                  节拍量测:一首歌 → audiomap.json(BPM/相位/唱句/能量/爆点)
 .claude/skills/painted-animation/   所用的 skill(上游 MIT,见其 LICENSE)
 ```
 
-- 分镜与每镜的「读点」:[把回忆拼好给你](projects/huiyi/STORYBOARD.md) · [潮汐](projects/chaoxi-tide/STORYBOARD.md)
+- 分镜与每镜的「读点」:[把回忆拼好给你](projects/huiyi/STORYBOARD.md) · [潮汐](projects/chaoxi-tide/STORYBOARD.md) · [夜蓝](projects/chaoxi-yelan/STORYBOARD.md)
 - 复现步骤 / 渲染与版权说明:[把回忆拼好给你](projects/huiyi/README.md) · [潮汐](projects/chaoxi-tide/README.md)
 
 **Skill 来源**:`painted-animation` by **tuzhechen2005**(仓库 `tuzhechen2005/opus-video-skills`,
